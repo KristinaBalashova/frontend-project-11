@@ -1,0 +1,25 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "[![Actions Status](https://github.com/KristinaBalashova/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/KristinaBalashova/frontend-project-11/actions) [![Maintainability](https://api.codeclimate.com/v1/badges/dce462a5eac056b98b46/maintainability)](https://codeclimate.com/github/KristinaBalashova/frontend-project-11/maintainability)",
+  "main": "index.js",
+  "scripts": {
+    "test": "\"echo \\\"Error: no test specified\\\" && exit 1\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KristinaBalashova/frontend-project-11.git"
+  },
+  "author": "balashova kristina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KristinaBalashova/frontend-project-11/issues"
+  },
+  "homepage": "https://github.com/KristinaBalashova/frontend-project-11#readme",
+  "devDependencies": {
+    "eslint": "^8.29.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}
