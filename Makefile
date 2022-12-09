@@ -13,3 +13,6 @@ test:
 
 lint:
 	npx eslint .
+
+install-deps:
+	npm ci
