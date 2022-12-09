@@ -1,11 +1,16 @@
 {
-  "name": "@hexlet/code",
+  "name": "my-webpack-project",
   "version": "1.0.0",
   "type": "module",
-  "description": "[![Actions Status](https://github.com/KristinaBalashova/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/KristinaBalashova/frontend-project-11/actions) [![Maintainability](https://api.codeclimate.com/v1/badges/dce462a5eac056b98b46/maintainability)](https://codeclimate.com/github/KristinaBalashova/frontend-project-11/maintainability)",
+  "description": "My webpack project",
   "main": "index.js",
   "scripts": {
-    "test": "\"echo \\\"Error: no test specified\\\" && exit 1\""
+    "test": "\"echo \\\"Error: no test specified\\\" && exit 1\"",
+    "build": "webpack --mode=production --node-env=production",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "serve": "webpack serve"
   },
   "repository": {
     "type": "git",
@@ -20,6 +25,10 @@
   "devDependencies": {
     "eslint": "^8.29.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0"
+    "eslint-plugin-import": "^2.26.0",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
   }
 }

@@ -1,11 +1,15 @@
-install: install-deps
-	npx simple-git-hooks
+develop:
+	npx webpack serve
 
-install-deps:
+install:
 	npm ci
 
-publish:
-	npm publish --dry-run
+build:
+	rm -rf dist
+	NODE_ENV=production npx webpack
+
+test:
+	npm test
 
 lint:
 	npx eslint .
