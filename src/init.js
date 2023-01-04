@@ -1,48 +1,49 @@
 import onChange from 'on-change';
 import * as yup from 'yup';
 
-const addedLinks = [];
 export default () => {
   const state = {
     form: {
-      valid: true,
+      valid: false,
     },
     errors: [],
+    addedLinks: [],
   };
 
-  const watchedState = onChange(state, (route, previousValue, value) => {
-    const form = document.querySelector('.form');
+  const watchedState = onChange(state, async (route, value, previousValue) => {
+    console.log('OnChange');
+    const form = document.querySelector('.rss-form');
     const input = document.querySelector('input');
+    console.log('added links: ', state.addedLinks);
+    //console.log('value', value);
     if (value === false) {
       input.classList.add('is-invalid');
-    } else if (state.form.valide === true) {
+    } else if (value === true) {
+      input.classList.remove('is-invalid');
       form.reset();
       input.focus();
     }
   });
 
-  const schema = yup.object({
-    url: yup.string()
-      .url()
-      .nullable()
-      .notOneOf(addedLinks, 'Err!'),
-  });
+  const schema = yup.string().required().url().notOneOf(state.addedLinks, 'Err!');
 
-  const button = document.querySelector('button[type="submit"]');
-  button.addEventListener('submit', (e) => {
+  const form = document.querySelector('.rss-form');
+  form.addEventListener('submit', (e) => {
+    console.log('SubmitEvent');
     e.preventDefault();
-    // const value = e.target.value;
     const formData = new FormData(e.target);
     const value = formData.get('url');
-    console.log('value', value);
+    console.log('input url: ', value);
     schema.validate(value)
       .then(() => {
+        console.log('validated');
         watchedState.form.valid = true;
         state.errors = null;
-        addedLinks.push(value);
+        state.addedLinks.push(value);
       })
       .catch((error) => {
-      // save erorrs
+        console.log('error');
+      	state.errors = error.name;
         watchedState.form.valid = false;
       });
   });
