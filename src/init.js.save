@@ -5,7 +5,6 @@ export default () => {
   const state = {
     form: {
       valid: false,
-      link: '',
     },
     errors: [],
     addedLinks: [],
@@ -25,24 +24,26 @@ export default () => {
       input.focus();
     }
   });
-  const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
+
+  const schema = yup.string().required().url).notOneOf(state.addedLinks, 'Err!');
 
   const form = document.querySelector('.rss-form');
   form.addEventListener('submit', (e) => {
-    const schema = makeSchema(state.addedLinks);
+    console.log('SubmitEvent');
     e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
-    watchedState.form.link = value;
-    schema.validate(watchedState.form.link)
-      .then((link) => {
+    console.log('input url: ', value);
+    schema.validate(value)
+      .then(() => {
         console.log('validated');
         watchedState.form.valid = true;
         state.errors = null;
-        watchedState.addedLinks.push(link);
+        state.addedLinks.push(value);
       })
       .catch((error) => {
-        state.errors = error.name;
+        console.log('error');
+      	state.errors = error.name;
         watchedState.form.valid = false;
       });
   });
