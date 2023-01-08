@@ -3,11 +3,11 @@ import * as yup from 'yup';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 
-export default () => {
+export default async () => {
   const i18nextInstance = i18next.createInstance();
 
-  i18nextInstance.init({
-    lng: 'en',
+  await i18nextInstance.init({
+    lng: 'ru',
     debug: true,
     resources,
   });
@@ -62,7 +62,7 @@ export default () => {
         state.addedLinks.push(link);
       })
       .catch((error) => {
-        state.errors = error
+        state.errors = error.message;
         watchedState.form.valid = false;
       });
   });
