@@ -8,7 +8,7 @@ export default {
       text: 'Ссылка RSS',
       posts: 'Посты',
       feeds: 'Фиды',
-      button: 'Просмотр',
+      postButton: 'Просмотр',
     },
     errors: {
       empty: 'Не должно быть пустым',

@@ -1,6 +1,41 @@
 import onChange from 'on-change';
 import parser from './parser.js';
 
+const handleFeeds = (feeds, dataFeeds, i18nextInstance) => {
+  const divBorder = document.createElement('div');
+  divBorder.classList.add('card', 'border-0');
+
+  const divBody = document.createElement('div');
+  divBody.classList.add('card-body');
+  const h2 = document.createElement('h2');
+  h2.classList.add('card-title', 'h4');
+  h2.innerHTML = i18nextInstance.t('interface.feeds');
+
+  divBorder.append(divBody);
+  divBody.append(h2);
+
+  feeds.append(divBorder);
+
+  dataFeeds.forEach((feed) => {
+    const ul = document.createElement('ul');
+    ul.classList.add('list-group', 'border-0', 'rounded-0');
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'border-0', 'border-end-0');
+    ul.append(li);
+    divBorder.append(ul);
+
+    const h3 = document.createElement('h3');
+    h3.classList.add('h6', 'm-0');
+    h3.textContent = feed.title;
+
+    li.prepend(h3);
+
+    const p = document.createElement('p');
+    p.classList.add('m-0', 'small', 'text-black-50');
+    p.textContent = feed.description;
+    li.append(p);
+  });
+};
 const handlePosts = (posts, postsData, i18nextInstance) => {
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -11,10 +46,10 @@ const handlePosts = (posts, postsData, i18nextInstance) => {
   h2.classList.add('card-title', 'h4');
   h2.innerHTML = i18nextInstance.t('interface.posts');
 
-  divBorder.prepend(divBody);
-  divBody.prepend(h2);
-  posts.prepend(divBorder);
+  divBorder.append(divBody);
+  divBody.append(h2);
 
+  posts.append(divBorder);
   postsData.forEach((post) => {
     const ul = document.createElement('ul');
     ul.classList.add('list-group', 'border-0', 'rounded-0');
@@ -40,7 +75,7 @@ const handlePosts = (posts, postsData, i18nextInstance) => {
     btn.dataset.id = post.id;
     btn.dataset.bsToggle = 'modal';
     btn.dataset.bsTarget = '#modal';
-    btn.textContent = i18nextInstance.t('interface.button');
+    btn.textContent = i18nextInstance.t('interface.postButton');
 
     li.prepend(a);
     li.append(btn);
@@ -48,13 +83,13 @@ const handlePosts = (posts, postsData, i18nextInstance) => {
 };
 const handleParsedData = (parsedContent, i18nextInstance) => {
   const posts = document.querySelector('.posts');
-  //  const feeds = document.querySelectorAll('.feeds');
+  const feeds = document.querySelector('.feeds');
 
-  // const dataFeeds = parsedContent.feeds;
+  const dataFeeds = parsedContent.feeds;
   const dataPosts = parsedContent.posts;
 
   handlePosts(posts, dataPosts, i18nextInstance);
-  // handleFeeds(dataFeeds);
+  handleFeeds(feeds, dataFeeds, i18nextInstance);
 };
 
 const handleProcess = (state, i18nextInstance) => {
