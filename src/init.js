@@ -2,6 +2,7 @@ import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import resources from './locales/index.js';
+import parser from './parser.js';
 
 export default async () => {
   const i18nextInstance = i18next.createInstance();
@@ -31,8 +32,7 @@ export default async () => {
     addedLinks: [],
   };
 
-  const watchedState = onChange(state, async (route, value, previousValue) => {
-    console.log(state.form.valid);
+  const watchedState = onChange(state, (route, value, previousValue) => {
     const form = document.querySelector('.rss-form');
     const input = document.querySelector('input');
     const feedback = document.querySelector('.feedback');
@@ -41,6 +41,16 @@ export default async () => {
       feedback.innerHTML = state.errors;
     } else if (value === true) {
       input.classList.remove('is-invalid');
+      fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`)
+        .then((response) => {
+          if (response.ok) return response.json();
+          throw new Error('Network response was not ok.');
+        })
+        .then((data) => {
+          parser(data.contents);
+        });
+
+      feedback.innerHTML = i18nextInstance.t('success');
       form.reset();
       input.focus();
     }
