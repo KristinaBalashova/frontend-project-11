@@ -1,28 +1,32 @@
 import onChange from 'on-change';
 import parser from './parser.js';
 
-const handleFeeds = (feeds, dataFeeds, i18nextInstance) => {
-  const divBorder = document.createElement('div');
-  divBorder.classList.add('card', 'border-0');
+const handleFeeds = (state, feeds, dataFeeds, i18nextInstance) => {
+  if (state.addedLinks.length === 1) {
+    const divBorder = document.createElement('div');
+    divBorder.classList.add('card', 'border-0');
 
-  const divBody = document.createElement('div');
-  divBody.classList.add('card-body');
-  const h2 = document.createElement('h2');
-  h2.classList.add('card-title', 'h4');
-  h2.innerHTML = i18nextInstance.t('interface.feeds');
+    const divBody = document.createElement('div');
+    divBody.classList.add('card-body');
+    const h2 = document.createElement('h2');
+    h2.classList.add('card-title', 'h4');
+    h2.innerHTML = i18nextInstance.t('interface.feeds');
 
-  divBorder.append(divBody);
-  divBody.append(h2);
+    divBorder.prepend(divBody);
+    divBody.append(h2);
 
-  feeds.append(divBorder);
-
+    feeds.prepend(divBorder);
+  }
+  const div = feeds.querySelector('.card');
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'border-0', 'rounded-0');
+  div.append(ul);
   dataFeeds.forEach((feed) => {
-    const ul = document.createElement('ul');
+    const list = feeds.querySelector('.list-group');
     ul.classList.add('list-group', 'border-0', 'rounded-0');
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
-    ul.append(li);
-    divBorder.append(ul);
+    list.prepend(li);
 
     const h3 = document.createElement('h3');
     h3.classList.add('h6', 'm-0');
@@ -40,36 +44,38 @@ const handleFeeds = (feeds, dataFeeds, i18nextInstance) => {
 const createModal = (post) => {
   const modalHeadline = document.querySelector('h5');
   modalHeadline.textContent = post.title;
-  
+
   const modalBody = document.querySelector('.modal-body');
   modalBody.textContent = post.description;
 
   const buttonRead = document.querySelector('.full-article');
-  buttonRead.setAttribute("href", post.link);
+  buttonRead.setAttribute('href', post.link);
 };
-const handlePosts = (posts, postsData, i18nextInstance) => {
-  const divBorder = document.createElement('div');
-  divBorder.classList.add('card', 'border-0');
+const handlePosts = (state, posts, postsData, i18nextInstance) => {
+  if (state.addedLinks.length === 1) {
+    const divBorder = document.createElement('div');
+    divBorder.classList.add('card', 'border-0');
+    const divBody = document.createElement('div');
+    divBody.classList.add('card-body');
+    const h2 = document.createElement('h2');
+    h2.classList.add('card-title', 'h4');
+    h2.innerHTML = i18nextInstance.t('interface.posts');
+    divBorder.prepend(divBody);
+    divBody.append(h2);
+    posts.prepend(divBorder);
+  }
 
-  const divBody = document.createElement('div');
-  divBody.classList.add('card-body');
-  const h2 = document.createElement('h2');
-  h2.classList.add('card-title', 'h4');
-  h2.innerHTML = i18nextInstance.t('interface.posts');
+  const div = posts.querySelector('.card');
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'border-0', 'rounded-0');
+  div.append(ul);
 
-  divBorder.append(divBody);
-  divBody.append(h2);
-
-  posts.append(divBorder);
   postsData.forEach((post) => {
-    const ul = document.createElement('ul');
-    ul.classList.add('list-group', 'border-0', 'rounded-0');
-
+    const list = posts.querySelector('.list-group');
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
-    ul.prepend(li);
-    divBorder.append(ul);
+    list.prepend(li);
 
     const a = document.createElement('a');
     a.classList.add('fw-bold');
@@ -88,26 +94,26 @@ const handlePosts = (posts, postsData, i18nextInstance) => {
     btn.dataset.bsTarget = '#modal';
     btn.textContent = i18nextInstance.t('interface.postButton');
 
-    li.prepend(a);
+    li.append(a);
     li.append(btn);
 
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener('click', (e) => {
       createModal(post);
-    
-      a.classList.remove("fw-bold"); 
-      a.classList.add("fw-normal");
-})
+
+      a.classList.remove('fw-bold');
+      a.classList.add('fw-normal');
+    });
   });
 };
-const handleParsedData = (parsedContent, i18nextInstance) => {
+const handleParsedData = (state, parsedContent, i18nextInstance) => {
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
 
   const dataFeeds = parsedContent.feeds;
   const dataPosts = parsedContent.posts;
 
-  handlePosts(posts, dataPosts, i18nextInstance);
-  handleFeeds(feeds, dataFeeds, i18nextInstance);
+  handlePosts(state, posts, dataPosts, i18nextInstance);
+  handleFeeds(state, feeds, dataFeeds, i18nextInstance);
 };
 
 const handleProcess = (state, i18nextInstance) => {
@@ -119,7 +125,6 @@ const handleProcess = (state, i18nextInstance) => {
       input.classList.add('is-invalid');
       feedback.innerHTML = state.errors;
     } else if (value === true) {
-      console.log('value', value);
       input.classList.remove('is-invalid');
       fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`)
         .then((response) => {
@@ -127,19 +132,20 @@ const handleProcess = (state, i18nextInstance) => {
           throw new Error('Network response was not ok.');
         })
         .then((data) => {
-          console.log(data.contents);
-          handleParsedData(parser(data.contents), i18nextInstance);
+          handleParsedData(state, parser(data.contents), i18nextInstance);
         })
         .catch((error) => {
-          console.log(error);
           feedback.innerHTML = i18nextInstance.t('errors.notRss');
+          console.log(error);
         });
 
       feedback.innerHTML = i18nextInstance.t('success');
       form.reset();
       input.focus();
+      state.form.valid = null;
     }
   });
+
   return watchedState;
 };
 

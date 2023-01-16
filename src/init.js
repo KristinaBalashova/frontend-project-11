@@ -35,8 +35,8 @@ export default async () => {
 
   const watchedState = handleProcess(state, i18nextInstance);
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
-
   const form = document.querySelector('.rss-form');
+  const p = document.querySelector('.feedback');
   form.addEventListener('submit', (e) => {
     const schema = makeSchema(state.addedLinks);
     e.preventDefault();
@@ -47,9 +47,13 @@ export default async () => {
       .then((link) => {
         watchedState.form.valid = true;
         state.errors = null;
+        p.classList.remove('text-danger');
+        p.classList.add('text-success');
         state.addedLinks.push(link);
       })
       .catch((error) => {
+        p.classList.remove('text-success');
+        p.classList.add('text-danger');
         state.errors = error.message;
         watchedState.form.valid = false;
       });

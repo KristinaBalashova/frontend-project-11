@@ -28,6 +28,8 @@ const parser = (contents) => {
 
     data.posts.push(post);
   });
+
+  console.log('data', data);
   return data;
 };
 
