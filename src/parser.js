@@ -1,19 +1,15 @@
-const parser = (contents) => {
+const parser = (state, contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
   const title = doc.querySelector('channel > title');
+console.log('contents', contents);
   const description = doc.querySelector('channel > description');
   const feed = {
     title: title.textContent,
     description: description.textContent,
   };
 
-  const data = {
-    feeds: [],
-    posts: [],
-  };
-
-  data.feeds.push(feed);
+  state.data.feeds.push(feed);
 
   const items = doc.querySelectorAll('item');
   items.forEach((item) => {
@@ -26,11 +22,8 @@ const parser = (contents) => {
       link: itemUrl.textContent,
     };
 
-    data.posts.push(post);
+    state.data.posts.push(post);
   });
-
-  console.log('data', data);
-  return data;
 };
 
 export default parser;

@@ -105,12 +105,12 @@ const handlePosts = (state, posts, postsData, i18nextInstance) => {
     });
   });
 };
-const handleParsedData = (state, parsedContent, i18nextInstance) => {
+const handleParsedData = (state, i18nextInstance) => {
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
 
-  const dataFeeds = parsedContent.feeds;
-  const dataPosts = parsedContent.posts;
+  const dataFeeds = state.data.feeds;
+  const dataPosts = state.data.posts;
 
   handlePosts(state, posts, dataPosts, i18nextInstance);
   handleFeeds(state, feeds, dataFeeds, i18nextInstance);
@@ -127,13 +127,12 @@ const handleProcess = (state, i18nextInstance) => {
     } else if (value === true) {
       input.classList.remove('is-invalid');
       fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`)
-        .then((response) => {
-          if (response.ok) return response.json();
-          throw new Error('Network response was not ok.');
-        })
+        .then((response) => response.json())
         .then((data) => {
-          handleParsedData(state, parser(data.contents), i18nextInstance);
-        })
+          return data.contents;
+})
+        .then((content) => parser(state, content))
+        .then(() => handleParsedData(state, i18nextInstance))
         .catch((error) => {
           feedback.innerHTML = i18nextInstance.t('errors.notRss');
           console.log(error);

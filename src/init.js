@@ -31,6 +31,10 @@ export default async () => {
     },
     errors: [],
     addedLinks: [],
+    data: {
+      feeds: [],
+      posts: [],
+    },
   };
 
   const watchedState = handleProcess(state, i18nextInstance);
