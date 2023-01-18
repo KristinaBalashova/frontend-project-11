@@ -2,7 +2,6 @@ const parser = (state, contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
   const title = doc.querySelector('channel > title');
-console.log('contents', contents);
   const description = doc.querySelector('channel > description');
   const feed = {
     title: title.textContent,
