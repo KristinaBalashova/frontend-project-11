@@ -1,4 +1,4 @@
-// import onChange from 'on-change';
+import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import resources from './locales/index.js';
@@ -24,6 +24,14 @@ export default async () => {
     },
   });
 
+  const elements = {
+    feedback: document.querySelector('.feedback'),
+    form: document.querySelector('.rss-form'),
+    feeds: document.querySelector('.feeds'),
+    posts: document.querySelector('.posts'),
+    input: document.querySelector('input'),
+  };
+
   const state = {
     modal: {
       activePost: '',
@@ -40,11 +48,10 @@ export default async () => {
     },
   };
 
-  const watchedState = handleProcess(state, i18nextInstance);
+  const watchedState = onChange(state, () => handleProcess(state, i18nextInstance, elements));
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
-  const form = document.querySelector('.rss-form');
-  const p = document.querySelector('.feedback');
-  form.addEventListener('submit', (e) => {
+
+  elements.form.addEventListener('submit', (e) => {
     const schema = makeSchema(state.addedLinks);
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -54,13 +61,13 @@ export default async () => {
       .then((link) => {
         watchedState.form.valid = true;
         state.errors = null;
-        p.classList.remove('text-danger');
-        p.classList.add('text-success');
+        elements.feedback.classList.remove('text-danger');
+        elements.feedback.classList.add('text-success');
         state.addedLinks.push(link);
       })
       .catch((error) => {
-        p.classList.remove('text-success');
-        p.classList.add('text-danger');
+        elements.feedback.classList.remove('text-success');
+        elements.feedback.classList.add('text-danger');
         state.errors = error.message;
         watchedState.form.valid = false;
       });

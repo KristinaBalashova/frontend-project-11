@@ -10,7 +10,7 @@ const parser = (state, contents) => {
     title: title.textContent,
     description: description.textContent,
   };
-
+  console.log('feed', feed.id);
   state.data.feeds.push(feed);
 
   const items = doc.querySelectorAll('item');
@@ -21,14 +21,14 @@ const parser = (state, contents) => {
     const allTitles = state.data.posts.map((post) => post.title);
     if (!allTitles.includes(itemTitle)) {
       const post = {
-      id: _.uniqueId(),
-      title: itemTitle.textContent,
-      description: itemDescription.textContent,
-      link: itemUrl.textContent,
-    };
-    state.data.posts.push(post);
+        id: _.uniqueId(),
+        title: itemTitle.textContent,
+        description: itemDescription.textContent,
+        link: itemUrl.textContent,
+      };
+      state.data.posts.push(post);
     }
-/*
+    /*
     const post = {
       id: _.uniqueId(),
       title: itemTitle.textContent,
