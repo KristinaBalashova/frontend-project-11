@@ -1,5 +1,6 @@
 import onChange from 'on-change';
 import parser from './parser.js';
+/* eslint-disable no-param-reassign */
 
 const handleFeeds = (state, feeds, dataFeeds, i18nextInstance) => {
   if (state.addedLinks.length === 1) {
@@ -41,18 +42,22 @@ const handleFeeds = (state, feeds, dataFeeds, i18nextInstance) => {
   });
 };
 
-const createModal = (post) => {
-  const modalHeadline = document.querySelector('h5');
-  modalHeadline.textContent = post.title;
+const createModal = (state) => {
+  state.data.posts.forEach((post) => {
+    if (post.id === state.modal.activePost) {
+      const modalHeadline = document.querySelector('h5');
+      modalHeadline.textContent = post.title;
+      const modalBody = document.querySelector('.modal-body');
+      modalBody.textContent = post.description;
 
-  const modalBody = document.querySelector('.modal-body');
-  modalBody.textContent = post.description;
-
-  const buttonRead = document.querySelector('.full-article');
-  buttonRead.setAttribute('href', post.link);
+      const buttonRead = document.querySelector('.full-article');
+      buttonRead.setAttribute('href', post.link);
+    }
+  });
 };
+
 const handlePosts = (state, posts, postsData, i18nextInstance) => {
-  if (state.addedLinks.length === 1) {
+/*  if (state.addedLinks.length === 1) {
     const divBorder = document.createElement('div');
     divBorder.classList.add('card', 'border-0');
     const divBody = document.createElement('div');
@@ -64,7 +69,18 @@ const handlePosts = (state, posts, postsData, i18nextInstance) => {
     divBody.append(h2);
     posts.prepend(divBorder);
   }
+*/
 
+ const divBorder = document.createElement('div');
+    divBorder.classList.add('card', 'border-0');
+    const divBody = document.createElement('div');
+    divBody.classList.add('card-body');
+    const h2 = document.createElement('h2');
+    h2.classList.add('card-title', 'h4');
+    h2.innerHTML = i18nextInstance.t('interface.posts');
+    divBorder.prepend(divBody);
+    divBody.append(h2);
+    posts.prepend(divBorder);
   const div = posts.querySelector('.card');
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
@@ -97,9 +113,9 @@ const handlePosts = (state, posts, postsData, i18nextInstance) => {
     li.append(a);
     li.append(btn);
 
-    btn.addEventListener('click', (e) => {
-      createModal(post);
-
+    btn.addEventListener('click', () => {
+      state.modal.activePost = post.id;
+      createModal(state);
       a.classList.remove('fw-bold');
       a.classList.add('fw-normal');
     });
@@ -129,13 +145,15 @@ const handleProcess = (state, i18nextInstance) => {
       fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`)
         .then((response) => response.json())
         .then((data) => {
+          //const content = data.contents;
           return data.contents;
-})
+
+        })
         .then((content) => parser(state, content))
         .then(() => handleParsedData(state, i18nextInstance))
         .catch((error) => {
           feedback.innerHTML = i18nextInstance.t('errors.notRss');
-          console.log(error);
+          console.log('error', error);
         });
 
       feedback.innerHTML = i18nextInstance.t('success');

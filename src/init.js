@@ -25,6 +25,9 @@ export default async () => {
   });
 
   const state = {
+    modal: {
+      activePost: '',
+    },
     form: {
       valid: null,
       link: '',
