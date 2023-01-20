@@ -1,5 +1,5 @@
 import parser from './parser.js';
-//import app from './init.js';
+// import app from './init.js';
 /* eslint-disable no-param-reassign */
 
 const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
@@ -86,14 +86,14 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     a.setAttribute('target', 'blank');
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
-    //console.log('post.id', post.id);
+    // console.log('post.id', post.id);
     a.textContent = post.title;
-    //console.log('modal', state.modal.openedPosts);
-   if (state.modal.openedPosts.includes(post.id)) {
+    // console.log('modal', state.modal.openedPosts);
+    if (state.modal.openedPosts.includes(post.id)) {
       a.classList.add('fw-normal');
-} else {
-   a.classList.add('fw-bold'); 
-}
+    } else {
+      a.classList.add('fw-bold');
+    }
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
@@ -108,7 +108,7 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     btn.addEventListener('click', () => {
       state.modal.activePost = post.id;
       createModal(state);
-   
+
       a.classList.remove('fw-bold');
       a.classList.add('fw-normal');
     });

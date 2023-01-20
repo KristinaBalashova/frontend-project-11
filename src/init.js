@@ -8,7 +8,7 @@ import handleProcess from './view.js';
 const app = () => {
   const i18nextInstance = i18next.createInstance();
 
- i18nextInstance.init({
+  i18nextInstance.init({
     lng: 'ru',
     debug: true,
     resources,
@@ -74,4 +74,4 @@ const app = () => {
       });
   });
 };
- export default app;
+export default app;
