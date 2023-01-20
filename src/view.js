@@ -1,5 +1,4 @@
 import parser from './parser.js';
-// import app from './init.js';
 /* eslint-disable no-param-reassign */
 
 const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
@@ -44,19 +43,6 @@ const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
   });
 };
 
-const createModal = (state) => {
-  state.data.posts.forEach((post) => {
-    if (post.id === state.modal.activePost) {
-      const modalHeadline = document.querySelector('h5');
-      modalHeadline.textContent = post.title;
-      const modalBody = document.querySelector('.modal-body');
-      modalBody.textContent = post.description;
-      const buttonRead = document.querySelector('.full-article');
-      buttonRead.setAttribute('href', post.link);
-      state.modal.openedPosts.push(post.id);
-    }
-  });
-};
 
 const handlePosts = (state, postsData, i18nextInstance, elements) => {
   elements.posts.innerHTML = '';
@@ -86,10 +72,10 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     a.setAttribute('target', 'blank');
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
-    // console.log('post.id', post.id);
     a.textContent = post.title;
-    // console.log('modal', state.modal.openedPosts);
+    console.log(post.id);
     if (state.modal.openedPosts.includes(post.id)) {
+      console.log(state.modal.openedPosts);
       a.classList.add('fw-normal');
     } else {
       a.classList.add('fw-bold');
@@ -104,7 +90,7 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
 
     li.append(a);
     li.append(btn);
-
+/*
     btn.addEventListener('click', () => {
       state.modal.activePost = post.id;
       createModal(state);
@@ -112,6 +98,20 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
       a.classList.remove('fw-bold');
       a.classList.add('fw-normal');
     });
+*/
+  });
+};
+
+const handleModal = (state) => {
+  state.data.posts.forEach((post) => {
+    if (post.id === state.modal.activePost) {
+      const modalHeadline = document.querySelector('h5');
+      modalHeadline.textContent = post.title;
+      const modalBody = document.querySelector('.modal-body');
+      modalBody.textContent = post.description;
+      const buttonRead = document.querySelector('.full-article');
+      buttonRead.setAttribute('href', post.link);
+    }
   });
 };
 const handleParsedData = (state, i18nextInstance, elements) => {
@@ -143,6 +143,9 @@ const handleProcess = (state, i18nextInstance, elements) => {
     elements.input.focus();
     state.form.valid = null;
   }
+  if (state.modal.activePost !== '') {
+   handleModal(state);
+}
 };
 
 export default handleProcess;

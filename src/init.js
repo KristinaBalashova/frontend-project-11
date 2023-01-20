@@ -73,5 +73,15 @@ const app = () => {
         watchedState.form.valid = false;
       });
   });
+
+  elements.posts.addEventListener('click', (e) => {
+    const postId = e.target.dataset.id;
+    if (!postId || e.target.tagName !== 'BUTTON') {
+      return;
+    }
+    watchedState.modal.openedPosts.push(postId);
+    watchedState.modal.activePost = postId;
+    console.log(state.modal.openedPosts);
+  });
 };
 export default app;
