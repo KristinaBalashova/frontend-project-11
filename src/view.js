@@ -1,4 +1,5 @@
 import parser from './parser.js';
+//import app from './init.js';
 /* eslint-disable no-param-reassign */
 
 const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
@@ -50,9 +51,9 @@ const createModal = (state) => {
       modalHeadline.textContent = post.title;
       const modalBody = document.querySelector('.modal-body');
       modalBody.textContent = post.description;
-
       const buttonRead = document.querySelector('.full-article');
       buttonRead.setAttribute('href', post.link);
+      state.modal.openedPosts.push(post.id);
     }
   });
 };
@@ -79,18 +80,20 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     const list = elements.posts.querySelector('.list-group');
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-
     list.prepend(li);
-
     const a = document.createElement('a');
-    a.classList.add('fw-bold');
-
     a.setAttribute('href', post.link);
     a.setAttribute('target', 'blank');
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
+    //console.log('post.id', post.id);
     a.textContent = post.title;
-
+    //console.log('modal', state.modal.openedPosts);
+   if (state.modal.openedPosts.includes(post.id)) {
+      a.classList.add('fw-normal');
+} else {
+   a.classList.add('fw-bold'); 
+}
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
@@ -105,6 +108,7 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     btn.addEventListener('click', () => {
       state.modal.activePost = post.id;
       createModal(state);
+   
       a.classList.remove('fw-bold');
       a.classList.add('fw-normal');
     });

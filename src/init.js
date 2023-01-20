@@ -5,10 +5,10 @@ import resources from './locales/index.js';
 // import parser from './parser.js';
 import handleProcess from './view.js';
 
-export default async () => {
+const app = () => {
   const i18nextInstance = i18next.createInstance();
 
-  await i18nextInstance.init({
+ i18nextInstance.init({
     lng: 'ru',
     debug: true,
     resources,
@@ -35,6 +35,7 @@ export default async () => {
   const state = {
     modal: {
       activePost: '',
+      openedPosts: [],
     },
     form: {
       valid: null,
@@ -73,3 +74,4 @@ export default async () => {
       });
   });
 };
+ export default app;
