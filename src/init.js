@@ -2,7 +2,7 @@ import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import resources from './locales/index.js';
-// import parser from './parser.js';
+import parser from './parser.js';
 import handleProcess from './view.js';
 
 const app = () => {
@@ -61,15 +61,23 @@ const app = () => {
     schema.validate(watchedState.form.link)
       .then((link) => {
         watchedState.form.valid = true;
-        state.errors = null;
-        elements.feedback.classList.remove('text-danger');
-        elements.feedback.classList.add('text-success');
+        watchedState.errors = null;
         state.addedLinks.push(link);
+        return fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
+      })
+      .then((response) => response.json())
+      .then((data) => data.contents)
+      .then((content) => parser(state, content))
+      .then((data) => {
+        const [feeds, posts] = data;
+        console.log(data);
+        watchedState.data.posts.push(posts);
+        console.log('state,posts', posts);
+        watchedState.data.feeds.push(feeds);
+        console.log('state,feeds', feeds);
       })
       .catch((error) => {
-        elements.feedback.classList.remove('text-success');
-        elements.feedback.classList.add('text-danger');
-        state.errors = error.message;
+        watchedState.errors = error.message;
         watchedState.form.valid = false;
       });
   });
@@ -81,7 +89,6 @@ const app = () => {
     }
     watchedState.modal.openedPosts.push(postId);
     watchedState.modal.activePost = postId;
-    console.log(state.modal.openedPosts);
   });
 };
 export default app;

@@ -10,9 +10,9 @@ const parser = (state, contents) => {
     title: title.textContent,
     description: description.textContent,
   };
-  console.log('feed', feed.id);
-  state.data.feeds.push(feed);
-
+  const allFeeds = [];
+  allFeeds.push(feed);
+  const allPosts = [];
   const items = doc.querySelectorAll('item');
   items.forEach((item) => {
     const itemTitle = item.querySelector('title');
@@ -26,18 +26,11 @@ const parser = (state, contents) => {
         description: itemDescription.textContent,
         link: itemUrl.textContent,
       };
-      state.data.posts.push(post);
+      allPosts.push(post);
+      // state.data.posts.push(post);
     }
-    /*
-    const post = {
-      id: _.uniqueId(),
-      title: itemTitle.textContent,
-      description: itemDescription.textContent,
-      link: itemUrl.textContent,
-    };
-    state.data.posts.push(post);
-*/
   });
+  return [allFeeds, allPosts];
 };
 
 export default parser;
