@@ -1,23 +1,17 @@
-// import parser from './parser.js';
 /* eslint-disable no-param-reassign */
 
 const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
   elements.feeds.innerHTML = '';
-
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
-
   const divBody = document.createElement('div');
   divBody.classList.add('card-body');
   const h2 = document.createElement('h2');
   h2.classList.add('card-title', 'h4');
   h2.innerHTML = i18nextInstance.t('interface.feeds');
-
   divBorder.prepend(divBody);
   divBody.append(h2);
-
   elements.feeds.prepend(divBorder);
-
   const div = elements.feeds.querySelector('.card');
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
@@ -86,7 +80,6 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     btn.dataset.bsToggle = 'modal';
     btn.dataset.bsTarget = '#modal';
     btn.textContent = i18nextInstance.t('interface.postButton');
-
     li.append(a);
     li.append(btn);
   });
@@ -101,18 +94,14 @@ const handleModal = (state) => {
       modalBody.textContent = post.description;
       const buttonRead = document.querySelector('.full-article');
       buttonRead.setAttribute('href', post.link);
+      const a = document.querySelector(`a[data-id="${post.id}"]`);
+      console.log('if', a);
+      a.classList.add('fw-normal');
+      a.classList.remove('fw-bold');
     }
   });
 };
-/*
-const handleParsedData = (state, i18nextInstance, elements) => {
-  const dataFeeds = state.data.feeds;
-  const dataPosts = state.data.posts;
 
-  handlePosts(state, dataPosts, i18nextInstance, elements);
-  handleFeeds(state, dataFeeds, i18nextInstance, elements);
-};
-*/
 const handleProcess = (state, i18nextInstance, elements) => {
   if (state.form.valid === false) {
     elements.input.classList.add('is-invalid');
@@ -123,15 +112,19 @@ const handleProcess = (state, i18nextInstance, elements) => {
     elements.input.classList.remove('is-invalid');
     elements.feedback.classList.remove('text-danger');
     elements.feedback.classList.add('text-success');
-
     elements.feedback.innerHTML = i18nextInstance.t('success');
     elements.form.reset();
     elements.input.focus();
-    const dataFeeds = state.data.feeds;
-    const dataPosts = state.data.posts;
 
-    handlePosts(state, dataPosts, i18nextInstance, elements);
-    handleFeeds(state, dataFeeds, i18nextInstance, elements);
+    if (state.status === 'ready') {
+      const dataFeeds = state.data.feeds;
+      const dataPosts = state.data.posts;
+
+      handlePosts(state, dataPosts, i18nextInstance, elements);
+      handleFeeds(state, dataFeeds, i18nextInstance, elements);
+      state.status = '';
+    }
+
     state.form.valid = null;
   }
   if (state.modal.activePost !== '') {

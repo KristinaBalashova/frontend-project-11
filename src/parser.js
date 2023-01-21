@@ -10,9 +10,7 @@ const parser = (state, contents) => {
     title: title.textContent,
     description: description.textContent,
   };
-  const allFeeds = [];
-  allFeeds.push(feed);
-  const allPosts = [];
+  const data = { feeds: feed, posts: [] };
   const items = doc.querySelectorAll('item');
   items.forEach((item) => {
     const itemTitle = item.querySelector('title');
@@ -26,11 +24,10 @@ const parser = (state, contents) => {
         description: itemDescription.textContent,
         link: itemUrl.textContent,
       };
-      allPosts.push(post);
-      // state.data.posts.push(post);
+      data.posts.push(post);
     }
   });
-  return [allFeeds, allPosts];
+  return data;
 };
 
 export default parser;

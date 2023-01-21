@@ -47,6 +47,7 @@ const app = () => {
       feeds: [],
       posts: [],
     },
+    status: '',
   };
 
   const watchedState = onChange(state, () => handleProcess(state, i18nextInstance, elements));
@@ -60,8 +61,8 @@ const app = () => {
     state.form.link = value;
     schema.validate(watchedState.form.link)
       .then((link) => {
-        watchedState.form.valid = true;
-        watchedState.errors = null;
+        state.form.valid = true;
+        state.errors = null;
         state.addedLinks.push(link);
         return fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
       })
@@ -69,12 +70,10 @@ const app = () => {
       .then((data) => data.contents)
       .then((content) => parser(state, content))
       .then((data) => {
-        const [feeds, posts] = data;
-        console.log(data);
-        watchedState.data.posts.push(posts);
-        console.log('state,posts', posts);
-        watchedState.data.feeds.push(feeds);
-        console.log('state,feeds', feeds);
+        const { feeds, posts } = data;
+        state.data.posts.push(...posts);
+        state.data.feeds.push(feeds);
+        watchedState.status = 'ready';
       })
       .catch((error) => {
         watchedState.errors = error.message;
