@@ -4,6 +4,7 @@ import i18next from 'i18next';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import handleProcess from './view.js';
+import updatePosts from './updatePosts.js';
 
 const app = () => {
   const i18nextInstance = i18next.createInstance();
@@ -89,5 +90,7 @@ const app = () => {
     watchedState.modal.openedPosts.push(postId);
     watchedState.modal.activePost = postId;
   });
+
+  updatePosts(watchedState, state);
 };
 export default app;
