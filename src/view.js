@@ -101,30 +101,43 @@ const handleModal = (state) => {
   });
 };
 
+const renderFeedback = (elements, state, i18nextInstance) => {
+  elements.feedback.textContent = i18nextInstance.t(state.feedback.message);
+
+  switch (state.feedback.type) {
+    case 'success':
+      elements.input.classList.remove('is-invalid');
+      elements.feedback.classList.remove('text-danger');
+      elements.feedback.classList.add('text-success');
+      elements.feedback.innerHTML = i18nextInstance.t('success');
+      break;
+
+    case 'validationError':
+    case 'axiosError':
+    case 'parserError':
+    case 'unknownError':
+      elements.input.classList.add('is-invalid');
+      elements.feedback.classList.remove('text-success');
+      elements.feedback.classList.add('text-danger');
+      break;
+
+    default:
+      throw new Error(`Unknown feedback code "${state.feedback.errors.message}"`);
+  }
+  state.form.valid = null;
+};
+
 const handleProcess = (state, i18nextInstance, elements) => {
-  if (state.form.valid === false) {
-    elements.input.classList.add('is-invalid');
-    elements.feedback.classList.remove('text-success');
-    elements.feedback.classList.add('text-danger');
-    elements.feedback.innerHTML = state.errors;
-  } else if (state.form.valid === true) {
-    elements.input.classList.remove('is-invalid');
-    elements.feedback.classList.remove('text-danger');
-    elements.feedback.classList.add('text-success');
-    elements.feedback.innerHTML = i18nextInstance.t('success');
+  renderFeedback(elements, state, i18nextInstance);
+  if (state.status === 'success') {
+    const dataFeeds = state.data.feeds;
+    const dataPosts = state.data.posts;
+
+    handlePosts(state, dataPosts, i18nextInstance, elements);
+    handleFeeds(state, dataFeeds, i18nextInstance, elements);
     elements.form.reset();
     elements.input.focus();
-
-    if (state.status === 'ready') {
-      const dataFeeds = state.data.feeds;
-      const dataPosts = state.data.posts;
-
-      handlePosts(state, dataPosts, i18nextInstance, elements);
-      handleFeeds(state, dataFeeds, i18nextInstance, elements);
-      state.status = '';
-    }
-
-    state.form.valid = null;
+    state.status = '';
   }
   if (state.modal.activePost !== '') {
     handleModal(state);

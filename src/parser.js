@@ -4,6 +4,11 @@ const parser = (state, contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
   const title = doc.querySelector('channel > title');
+
+  if (!doc.querySelector('rss')) {
+    throw new Error('ParserError');
+  }
+
   const description = doc.querySelector('channel > description');
   const feed = {
     id: _.uniqueId(),

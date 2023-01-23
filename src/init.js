@@ -43,7 +43,10 @@ const app = () => {
       valid: null,
       link: '',
     },
-    errors: [],
+    feedback: {
+      type: '',
+      message: '',
+    },
     addedLinks: [],
     data: {
       feeds: [],
@@ -53,6 +56,30 @@ const app = () => {
   };
 
   const watchedState = onChange(state, () => handleProcess(state, i18nextInstance, elements));
+  const handleError = (error) => {
+    switch (error.name) {
+      case 'ValidationError':
+        state.form.valid = false;
+        state.feedback.type = 'validationError';
+        state.feedback.message = error.message;
+        break;
+      case 'AxiosError':
+        state.feedback.type = 'axiosError';
+        state.feedback.message = i18nextInstance.t('errors.network');
+        break;
+      case 'Error':
+        if (error.message === 'ParserError') {
+          state.feedback.type = 'parserError';
+          state.feedback.message = i18nextInstance.t('errors.notRss');
+        }
+        break;
+      default:
+        state.feedback.type = 'unknownError';
+        state.feedback.message = error.message;
+        throw new Error('UnknownError');
+    }
+    watchedState.status = 'failed';
+  };
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
 
   elements.form.addEventListener('submit', (e) => {
@@ -63,28 +90,28 @@ const app = () => {
     state.form.link = value;
     schema.validate(watchedState.form.link)
       .then((link) => {
+        state.status = 'validated';
         state.form.valid = true;
         state.errors = null;
         state.addedLinks.push(link);
         return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
       })
-      .then((response) => response.json())
-      .then((data) => data.contents)
+      .then((response) => response.data.contents)
       .then((content) => parser(state, content))
       .then((data) => {
+        watchedState.status = 'validated';
         const { feeds, posts } = data;
         state.data.posts.push(...posts);
         state.data.feeds.push(feeds);
-        watchedState.status = 'ready';
+        state.feedback.message = i18nextInstance.t('success');
+        state.feedback.type = 'success';
+        watchedState.status = 'success';
       })
       .catch((error) => {
-        console.log('error', error);
-        console.log('message', error.message);
-        if (error.name === 'Error') {
-          watchedState.errors = i18nextInstance.t('notRss');
-        }
-        watchedState.errors = error.message;
-        watchedState.form.valid = false;
+        handleError(error);
+        console.log('error', error.message);
+        // watchedState.errors = error.message;
+        // watchedState.form.valid = false;
       });
   });
 
@@ -97,6 +124,6 @@ const app = () => {
     watchedState.modal.activePost = postId;
   });
 
-  updatePosts(watchedState, state);
+  // updatePosts(watchedState, state);
 };
 export default app;
