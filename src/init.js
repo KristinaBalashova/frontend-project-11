@@ -1,6 +1,7 @@
 import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
+import axios from 'axios';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import handleProcess from './view.js';
@@ -65,7 +66,7 @@ const app = () => {
         state.form.valid = true;
         state.errors = null;
         state.addedLinks.push(link);
-        return fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
+        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
       })
       .then((response) => response.json())
       .then((data) => data.contents)
@@ -77,6 +78,11 @@ const app = () => {
         watchedState.status = 'ready';
       })
       .catch((error) => {
+        console.log('error', error);
+        console.log('message', error.message);
+        if (error.name === 'Error') {
+          watchedState.errors = i18nextInstance.t('notRss');
+        }
         watchedState.errors = error.message;
         watchedState.form.valid = false;
       });

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import parser from './parser.js';
 /* eslint-disable no-param-reassign */
 const updatePosts = (watchedState, state) => {
@@ -5,7 +6,7 @@ const updatePosts = (watchedState, state) => {
   console.log(state.addedLinks);
   if (state.addedLinks.length !== 0) {
     console.log(state.addedLinks);
-    state.addedLinks.forEach((link) => fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`)
+    state.addedLinks.forEach((link) => axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`)
       .then((response) => response.json())
       .then((data) => {
         const doc = new DOMParser();

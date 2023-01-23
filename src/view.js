@@ -66,7 +66,6 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
     a.textContent = post.title;
-    console.log(post.id);
     if (state.modal.openedPosts.includes(post.id)) {
       console.log(state.modal.openedPosts);
       a.classList.add('fw-normal');
