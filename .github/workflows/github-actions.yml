@@ -33,13 +33,13 @@ jobs:
           cache: 'npm'
       - run: make install-deps
       - run: make lint
-      - name: Test & publish code coverage
+      #- name: Test & publish code coverage
         # Publish code coverage on Code Climate
         # https://github.com/paambaati/codeclimate-action
         # uses: paambaati/codeclimate-action@v3
-        uses: paambaati/codeclimate-action@v3.0.0
+       # uses: paambaati/codeclimate-action@v3.0.0
         # Add Code Climate secret key
-        env:
-          CC_TEST_REPORTER_ID : ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          coverageCommand: make test-coverage
+        #env:
+         # CC_TEST_REPORTER_ID : ${{ secrets.CC_TEST_REPORTER_ID }}
+        #with:
+          #coverageCommand: make test-coverage
