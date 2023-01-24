@@ -104,7 +104,7 @@ const app = () => {
         console.log(feeds.url);
         watchedState.data.posts.push(...posts);
         watchedState.data.feeds.push(feeds);
-        watchedState.feedback.message = i18nInstance.t('success');
+        // watchedState.feedback.message = i18nInstance.t('success');
         watchedState.feedback.type = 'success';
         watchedState.status = 'renderFeedback';
       })

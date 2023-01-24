@@ -13,6 +13,8 @@ const updatePosts = (watchedState) => {
       .then((contents) => {
         console.log('parsed');
         parser(watchedState, contents);
+        watchedState.feedback.type = 'success';
+        watchedState.status = 'renderFeedback';
       })
       .catch((error) => {
         console.log(error.message);
