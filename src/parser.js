@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const parser = (state, contents) => {
+const parser = (watchedState, contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
   const title = doc.querySelector('channel > title');
@@ -21,7 +21,7 @@ const parser = (state, contents) => {
     const itemTitle = item.querySelector('title');
     const itemUrl = item.querySelector('link');
     const itemDescription = item.querySelector('description');
-    const allTitles = state.data.posts.map((post) => post.title);
+    const allTitles = watchedState.data.posts.map((post) => post.title);
     if (!allTitles.includes(itemTitle)) {
       const post = {
         id: _.uniqueId(),

@@ -5,12 +5,12 @@ import axios from 'axios';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import handleProcess from './view.js';
-import updatePosts from './updatePosts.js';
+// import updatePosts from './updatePosts.js';
 
 const app = () => {
-  const i18nextInstance = i18next.createInstance();
+  const i18nInstance = i18next.createInstance();
 
-  i18nextInstance.init({
+  i18nInstance.init({
     lng: 'ru',
     debug: true,
     resources,
@@ -18,11 +18,11 @@ const app = () => {
 
   yup.setLocale({
     mixed: {
-      notOneOf: i18nextInstance.t('errors.alreadyExist'),
+      notOneOf: i18nInstance.t('errors.alreadyExist'),
     },
     string: {
-      required: i18nextInstance.t('errors.empty'),
-      url: i18nextInstance.t('errors.notValid'),
+      required: i18nInstance.t('errors.empty'),
+      url: i18nInstance.t('errors.notValid'),
     },
   });
 
@@ -52,66 +52,62 @@ const app = () => {
       feeds: [],
       posts: [],
     },
-    status: '',
+    status: 'initial',
   };
 
-  const watchedState = onChange(state, () => handleProcess(state, i18nextInstance, elements));
+  const watchedState = onChange(state, () => handleProcess(watchedState, i18nInstance, elements));
   const handleError = (error) => {
     switch (error.name) {
       case 'ValidationError':
-        state.form.valid = false;
-        state.feedback.type = 'validationError';
-        state.feedback.message = error.message;
+        watchedState.form.valid = false;
+        watchedState.feedback.type = 'validationError';
+        watchedState.feedback.message = error.message;
         break;
       case 'AxiosError':
-        state.feedback.type = 'axiosError';
-        state.feedback.message = i18nextInstance.t('errors.network');
+        watchedState.feedback.type = 'axiosError';
+        watchedState.feedback.message = i18nInstance.t('errors.network');
         break;
       case 'Error':
         if (error.message === 'ParserError') {
-          state.feedback.type = 'parserError';
-          state.feedback.message = i18nextInstance.t('errors.notRss');
+          watchedState.feedback.type = 'parserError';
+          watchedState.feedback.message = i18nInstance.t('errors.notRss');
         }
         break;
       default:
-        state.feedback.type = 'unknownError';
-        state.feedback.message = error.message;
+        watchedState.feedback.type = 'unknownError';
+        watchedState.feedback.message = error.message;
         throw new Error('UnknownError');
     }
-    watchedState.status = 'failed';
+    watchedState.status = 'renderFeedback';
   };
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
 
   elements.form.addEventListener('submit', (e) => {
-    const schema = makeSchema(state.addedLinks);
+    const schema = makeSchema(watchedState.addedLinks);
     e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
-    state.form.link = value;
+    watchedState.form.link = value;
     schema.validate(watchedState.form.link)
       .then((link) => {
-        state.status = 'validated';
-        state.form.valid = true;
-        state.errors = null;
-        state.addedLinks.push(link);
+        watchedState.status = 'validated';
+        watchedState.form.valid = true;
+        watchedState.errors = null;
+        watchedState.addedLinks.push(link);
         return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
       })
       .then((response) => response.data.contents)
-      .then((content) => parser(state, content))
+      .then((content) => parser(watchedState, content))
       .then((data) => {
-        watchedState.status = 'validated';
         const { feeds, posts } = data;
-        state.data.posts.push(...posts);
-        state.data.feeds.push(feeds);
-        state.feedback.message = i18nextInstance.t('success');
-        state.feedback.type = 'success';
-        watchedState.status = 'success';
+        watchedState.data.posts.push(...posts);
+        watchedState.data.feeds.push(feeds);
+        watchedState.feedback.message = i18nInstance.t('success');
+        watchedState.feedback.type = 'success';
+        watchedState.status = 'renderFeedback';
       })
       .catch((error) => {
         handleError(error);
-        console.log('error', error.message);
-        // watchedState.errors = error.message;
-        // watchedState.form.valid = false;
       });
   });
 
@@ -124,6 +120,6 @@ const app = () => {
     watchedState.modal.activePost = postId;
   });
 
-  // updatePosts(watchedState, state);
+  // updatePosts(watchedState);
 };
 export default app;

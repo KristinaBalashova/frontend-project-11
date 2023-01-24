@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
+const handleFeeds = (watchedState, dataFeeds, i18nextInstance, elements) => {
   elements.feeds.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -37,7 +37,7 @@ const handleFeeds = (state, dataFeeds, i18nextInstance, elements) => {
   });
 };
 
-const handlePosts = (state, postsData, i18nextInstance, elements) => {
+const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
   elements.posts.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -66,8 +66,7 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
     a.textContent = post.title;
-    if (state.modal.openedPosts.includes(post.id)) {
-      console.log(state.modal.openedPosts);
+    if (watchedState.modal.openedPosts.includes(post.id)) {
       a.classList.add('fw-normal');
     } else {
       a.classList.add('fw-bold');
@@ -84,9 +83,9 @@ const handlePosts = (state, postsData, i18nextInstance, elements) => {
   });
 };
 
-const handleModal = (state) => {
-  state.data.posts.forEach((post) => {
-    if (post.id === state.modal.activePost) {
+const handleModal = (watchedState) => {
+  watchedState.data.posts.forEach((post) => {
+    if (post.id === watchedState.modal.activePost) {
       const modalHeadline = document.querySelector('h5');
       modalHeadline.textContent = post.title;
       const modalBody = document.querySelector('.modal-body');
@@ -94,22 +93,20 @@ const handleModal = (state) => {
       const buttonRead = document.querySelector('.full-article');
       buttonRead.setAttribute('href', post.link);
       const a = document.querySelector(`a[data-id="${post.id}"]`);
-      console.log('if', a);
       a.classList.add('fw-normal');
       a.classList.remove('fw-bold');
     }
   });
 };
 
-const renderFeedback = (elements, state, i18nextInstance) => {
-  elements.feedback.textContent = i18nextInstance.t(state.feedback.message);
-
-  switch (state.feedback.type) {
+const renderFeedback = (elements, watchedState, i18nextInstance) => {
+  switch (watchedState.feedback.type) {
     case 'success':
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.remove('text-danger');
       elements.feedback.classList.add('text-success');
       elements.feedback.innerHTML = i18nextInstance.t('success');
+      watchedState.status = 'readyToLoad';
       break;
 
     case 'validationError':
@@ -119,28 +116,31 @@ const renderFeedback = (elements, state, i18nextInstance) => {
       elements.input.classList.add('is-invalid');
       elements.feedback.classList.remove('text-success');
       elements.feedback.classList.add('text-danger');
+      elements.feedback.textContent = i18nextInstance.t(watchedState.feedback.message);
       break;
 
     default:
-      throw new Error(`Unknown feedback code "${state.feedback.errors.message}"`);
+      throw new Error(`Unknown feedback code "${watchedState.feedback.errors.message}"`);
   }
-  state.form.valid = null;
+  watchedState.form.valid = null;
 };
 
-const handleProcess = (state, i18nextInstance, elements) => {
-  renderFeedback(elements, state, i18nextInstance);
-  if (state.status === 'success') {
-    const dataFeeds = state.data.feeds;
-    const dataPosts = state.data.posts;
+const handleProcess = (watchedState, i18nextInstance, elements) => {
+  if (watchedState.status === 'renderFeedback') {
+    renderFeedback(elements, watchedState, i18nextInstance);
+  }
 
-    handlePosts(state, dataPosts, i18nextInstance, elements);
-    handleFeeds(state, dataFeeds, i18nextInstance, elements);
+  if (watchedState.status === 'readyToLoad') {
+    const dataFeeds = watchedState.data.feeds;
+    const dataPosts = watchedState.data.posts;
+    handlePosts(watchedState, dataPosts, i18nextInstance, elements);
+    handleFeeds(watchedState, dataFeeds, i18nextInstance, elements);
     elements.form.reset();
     elements.input.focus();
-    state.status = '';
+    watchedState.status = '';
   }
-  if (state.modal.activePost !== '') {
-    handleModal(state);
+  if (watchedState.modal.activePost !== '') {
+    handleModal(watchedState);
   }
 };
 
