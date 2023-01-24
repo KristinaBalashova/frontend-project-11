@@ -1,33 +1,26 @@
 import axios from 'axios';
 import parser from './parser.js';
 /* eslint-disable no-param-reassign */
-const updatePosts = (watchedState) => {
-  console.log('updating');
-  if (watchedState.addedLinks.length !== 0) {
-    watchedState.addedLinks.forEach((link) => axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const doc = new DOMParser();
-        const dom = doc.parseFromString(data.contents, 'text/xml');
-        const dataParse = parser(dom);
-        return dataParse;
-      })
-      .then((parsedData) => {
-        const fetchedPostNames = watchedState.posts.map((post) => post.name);
 
-        parsedData.posts.forEach((post) => {
-          if (!fetchedPostNames.includes(post.name)) {
-            watchedState.posts.push(post);
-          }
-        });
-        console.log('dataLodaed');
-        // watchedState.updatePostsStatus = "ready";
+const updatePosts = (watchedState) => {
+  console.log('launched');
+  console.log(watchedState.feeds);
+  const promises = watchedState.data.feeds.map((element) => {
+    console.log(element);
+    const { url } = element;
+    const promise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+      .then((response) => response.data.contents)
+      .then((contents) => {
+        console.log('parsed');
+        parser(watchedState, contents);
       })
       .catch((error) => {
-        watchedState.error = error.message;
-      }));
-  }
-  setTimeout(updatePosts, 5000);
+        console.log(error.message);
+        watchedState.feedback.message = error.message;
+      });
+    return promise;
+  });
+  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 5000));
 };
 
 export default updatePosts;

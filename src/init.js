@@ -5,7 +5,7 @@ import axios from 'axios';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import handleProcess from './view.js';
-// import updatePosts from './updatePosts.js';
+import updatePosts from './updatePosts.js';
 
 const app = () => {
   const i18nInstance = i18next.createInstance();
@@ -94,12 +94,14 @@ const app = () => {
         watchedState.form.valid = true;
         watchedState.errors = null;
         watchedState.addedLinks.push(link);
-        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(state.form.link)}`);
+        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(watchedState.form.link)}`);
       })
       .then((response) => response.data.contents)
       .then((content) => parser(watchedState, content))
       .then((data) => {
         const { feeds, posts } = data;
+        feeds.url = elements.input.value;
+        console.log(feeds.url);
         watchedState.data.posts.push(...posts);
         watchedState.data.feeds.push(feeds);
         watchedState.feedback.message = i18nInstance.t('success');
@@ -120,6 +122,6 @@ const app = () => {
     watchedState.modal.activePost = postId;
   });
 
-  // updatePosts(watchedState);
+  updatePosts(watchedState);
 };
 export default app;
