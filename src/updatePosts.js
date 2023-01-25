@@ -4,15 +4,16 @@ import parser from './parser.js';
 
 const updatePosts = (watchedState) => {
   console.log('launched');
-  console.log(watchedState.feeds);
   const promises = watchedState.data.feeds.map((element) => {
-    console.log(element);
+    console.log('el', element);
     const { url } = element;
+    console.log(url);
     const promise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
       .then((response) => response.data.contents)
       .then((contents) => {
         console.log('parsed');
-        parser(watchedState, contents);
+        const { posts } = parser(watchedState, contents);
+        watchedState.data.posts.push(...posts);
         watchedState.feedback.type = 'success';
         watchedState.status = 'renderFeedback';
       })
