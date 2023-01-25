@@ -55,11 +55,10 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
   div.append(ul);
 
-  postsData.forEach((post) => {
-    const list = elements.posts.querySelector('.list-group');
+  const postEl = postsData.map((post) => {
+    console.log('post', post);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-    list.prepend(li);
     const a = document.createElement('a');
     a.setAttribute('href', post.link);
     a.setAttribute('target', 'blank');
@@ -80,7 +79,9 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
     btn.textContent = i18nextInstance.t('interface.postButton');
     li.append(a);
     li.append(btn);
+    return li;
   });
+  ul.prepend(...postEl);
 };
 
 const handleModal = (watchedState) => {

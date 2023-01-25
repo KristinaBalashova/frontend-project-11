@@ -12,7 +12,7 @@ const app = () => {
 
   i18nInstance.init({
     lng: 'ru',
-    debug: true,
+    debug: false,
     resources,
   });
 
@@ -102,9 +102,8 @@ const app = () => {
         const { feeds, posts } = data;
         feeds.url = elements.input.value;
         console.log(feeds.url);
-        watchedState.data.posts.push(...posts);
+        watchedState.data.posts.unshift(...posts);
         watchedState.data.feeds.push(feeds);
-        // watchedState.feedback.message = i18nInstance.t('success');
         watchedState.feedback.type = 'success';
         watchedState.status = 'renderFeedback';
       })
