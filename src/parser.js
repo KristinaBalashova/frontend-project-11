@@ -20,16 +20,14 @@ const parser = (watchedState, contents) => {
     const itemTitle = item.querySelector('title');
     const itemUrl = item.querySelector('link');
     const itemDescription = item.querySelector('description');
-    const allTitles = watchedState.data.posts.map((post) => post.title);
-    if (!allTitles.includes(itemTitle)) {
-      const post = {
-        id: _.uniqueId(),
-        title: itemTitle.textContent,
-        description: itemDescription.textContent,
-        link: itemUrl.textContent,
-      };
-      data.posts.push(post);
-    }
+    const post = {
+      id: _.uniqueId(),
+      feedId: feed.id,
+      title: itemTitle.textContent,
+      description: itemDescription.textContent,
+      link: itemUrl.textContent,
+    };
+    data.posts.push(post);
   });
   return data;
 };

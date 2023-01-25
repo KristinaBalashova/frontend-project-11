@@ -8,22 +8,31 @@ const updatePosts = (watchedState) => {
     console.log('el', element);
     const { url } = element;
     console.log(url);
-    const promise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+    const proxy = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+    const promise = axios.get(proxy)
       .then((response) => response.data.contents)
       .then((contents) => {
         console.log('parsed');
         const { posts } = parser(watchedState, contents);
-        watchedState.data.posts.push(...posts);
-        watchedState.feedback.type = 'success';
-        watchedState.status = 'renderFeedback';
+        const postsFromState = watchedState.data.posts;
+        const postsWithCurrentId = postsFromState.filter((post) => post.feedId === element.id);
+        const addedTitles = postsWithCurrentId.map((el) => el.title);
+        console.log(postsFromState, 'fromState');
+        console.log('elId', element.id);
+        console.log('postsWithCurrent', postsWithCurrentId);
+        posts.forEach((newPost) => {
+          if (!addedTitles.includes(newPost.title)) {
+            watchedState.data.posts.push(newPost);
+          }
+        });
       })
       .catch((error) => {
-        console.log(error.message);
         watchedState.feedback.message = error.message;
       });
+    watchedState.status = 'readyToLoad';
     return promise;
   });
-  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 5000));
+  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 15000));
 };
 
 export default updatePosts;
