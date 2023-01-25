@@ -94,7 +94,7 @@ const app = () => {
         watchedState.form.valid = true;
         watchedState.errors = null;
         watchedState.addedLinks.push(link);
-        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(watchedState.form.link)}`);
+        return axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`);
       })
       .then((response) => response.data.contents)
       .then((content) => parser(watchedState, content))
