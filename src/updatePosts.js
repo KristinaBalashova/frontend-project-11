@@ -32,7 +32,7 @@ const updatePosts = (watchedState) => {
     watchedState.status = 'readyToLoad';
     return promise;
   });
-  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 15000));
+  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 5000));
 };
 
 export default updatePosts;
