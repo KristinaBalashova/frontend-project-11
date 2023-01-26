@@ -4,7 +4,7 @@ import i18next from 'i18next';
 import axios from 'axios';
 import resources from './locales/index.js';
 import parser from './parser.js';
-import handleProcess from './view.js';
+import renderData from './view.js';
 import updatePosts from './updatePosts.js';
 
 const app = () => {
@@ -55,7 +55,7 @@ const app = () => {
     status: 'initial',
   };
 
-  const watchedState = onChange(state, () => handleProcess(watchedState, i18nInstance, elements));
+  const watchedState = onChange(state, () => renderData(watchedState, i18nInstance, elements));
   const handleError = (error) => {
     switch (error.name) {
       case 'ValidationError':

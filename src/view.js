@@ -56,7 +56,6 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
   div.append(ul);
 
   const postEl = postsData.map((post) => {
-    console.log('post', post);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
@@ -126,7 +125,7 @@ const renderFeedback = (elements, watchedState, i18nextInstance) => {
   watchedState.form.valid = null;
 };
 
-const handleProcess = (watchedState, i18nextInstance, elements) => {
+const renderData = (watchedState, i18nextInstance, elements) => {
   if (watchedState.status === 'renderFeedback') {
     renderFeedback(elements, watchedState, i18nextInstance);
   }
@@ -140,9 +139,10 @@ const handleProcess = (watchedState, i18nextInstance, elements) => {
     elements.input.focus();
     watchedState.status = '';
   }
+
   if (watchedState.modal.activePost !== '') {
     handleModal(watchedState);
   }
 };
 
-export default handleProcess;
+export default renderData;

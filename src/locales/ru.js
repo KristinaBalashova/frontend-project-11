@@ -3,12 +3,12 @@ export default {
     interface: {
       headline: 'RSS агрегатор',
       description: 'Начните читать RSS сегодня! Это легко, это красиво.',
-      button: 'Добавить',
+      addButton: 'Добавить',
       hint: 'Пример: https://ru.hexlet.io/lessons.rss',
       text: 'Ссылка RSS',
       posts: 'Посты',
       feeds: 'Фиды',
-      postButton: 'Просмотр',
+      previewButton: 'Просмотр',
     },
     errors: {
       empty: 'Не должно быть пустым',
