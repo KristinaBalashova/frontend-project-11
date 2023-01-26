@@ -75,7 +75,7 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
     btn.dataset.id = post.id;
     btn.dataset.bsToggle = 'modal';
     btn.dataset.bsTarget = '#modal';
-    btn.textContent = i18nextInstance.t('interface.postButton');
+    btn.textContent = i18nextInstance.t('interface.previewButton');
     li.append(a);
     li.append(btn);
     return li;
