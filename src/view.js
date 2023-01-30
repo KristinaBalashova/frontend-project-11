@@ -64,7 +64,7 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
     a.setAttribute('rel', 'noopener noreferrer');
     a.dataset.id = post.id;
     a.textContent = post.title;
-    if (watchedState.modal.openedPosts.includes(post.id)) {
+    if (watchedState.openedPosts.includes(post.id)) {
       a.classList.add('fw-normal');
     } else {
       a.classList.add('fw-bold');

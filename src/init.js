@@ -37,8 +37,8 @@ const app = () => {
       const state = {
         modal: {
           activePost: '',
-          openedPosts: [],
         },
+        openedPosts: [],
         form: {
           valid: null,
           link: '',
@@ -117,7 +117,7 @@ const app = () => {
         if (!postId || e.target.tagName !== 'BUTTON') {
           return;
         }
-        watchedState.modal.openedPosts.push(postId);
+        watchedState.openedPosts.push(postId);
         watchedState.modal.activePost = postId;
       });
 
