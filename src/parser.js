@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const parser = (watchedState, contents) => {
+const parser = (contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
   const title = doc.querySelector('channel > title');

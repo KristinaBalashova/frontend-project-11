@@ -10,9 +10,9 @@ export default {
       feeds: 'Фиды',
       previewButton: 'Просмотр',
     },
-    errors: {
+    error: {
       empty: 'Не должно быть пустым',
-      alreadyExist: 'RSS уже существует',
+      alreadyExists: 'RSS уже существует',
       notValid: 'Ссылка должна быть валидным URL',
       notRss: 'Ресурс не содержит валидный RSS',
       network: 'Ошибка сети',

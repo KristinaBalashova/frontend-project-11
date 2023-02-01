@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-const handleFeeds = (watchedState, dataFeeds, i18nextInstance, elements) => {
+const handleFeeds = (dataFeeds, i18nextInstance, elements) => {
   elements.feeds.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -98,49 +98,65 @@ const handleModal = (watchedState) => {
     }
   });
 };
-
-const renderFeedback = (elements, watchedState, i18nextInstance) => {
-  switch (watchedState.feedback.type) {
-    case 'success':
-      elements.input.classList.remove('is-invalid');
-      elements.feedback.classList.remove('text-danger');
-      elements.feedback.classList.add('text-success');
-      elements.feedback.innerHTML = i18nextInstance.t('success');
-      watchedState.status = 'readyToLoad';
+const renderValidationError = (errorMessage, elements, i18nextInstance) => {
+  console.log('message', errorMessage);
+  switch (errorMessage) {
+    case 'alreadyExists':
+      elements.feedback.textContent = i18nextInstance.t('error.alreadyExists');
       break;
-
-    case 'validationError':
-    case 'axiosError':
-    case 'parserError':
-    case 'unknownError':
-      elements.input.classList.add('is-invalid');
-      elements.feedback.classList.remove('text-success');
-      elements.feedback.classList.add('text-danger');
-      elements.feedback.textContent = i18nextInstance.t(watchedState.feedback.message);
+    case 'empty':
+      elements.feedback.textContent = i18nextInstance.t('error.empty');
       break;
-
+    case 'notValid':
+      elements.feedback.textContent = i18nextInstance.t('error.notValid');
+      break;
     default:
-      throw new Error(`Unknown feedback code "${watchedState.feedback.errors.message}"`);
+      throw new Error('Unknown error');
   }
-  watchedState.form.valid = null;
+};
+const renderFeedback = (elements, watchedState, i18nextInstance) => {
+  if (watchedState.loading.status === 'success') {
+    elements.input.classList.remove('is-invalid');
+    elements.feedback.classList.remove('text-danger');
+    elements.feedback.classList.add('text-success');
+    elements.feedback.innerHTML = i18nextInstance.t('success');
+    watchedState.form.status = 'readyToLoad';
+  } else {
+    elements.input.classList.add('is-invalid');
+    elements.feedback.classList.remove('text-success');
+    elements.feedback.classList.add('text-danger');
+    switch (watchedState.loading.error) {
+      case 'validationError':
+        renderValidationError(watchedState.form.validationError, elements, i18nextInstance);
+        break;
+      case 'axiosError':
+        elements.feedback.textContent = i18nextInstance.t('error.network');
+        break;
+      case 'parserError':
+        elements.feedback.textContent = i18nextInstance.t('error.notRss');
+        break;
+      default:
+        throw new Error('Unknown error');
+    }
+  }
 };
 
 const renderData = (watchedState, i18nextInstance, elements) => {
-  if (watchedState.status === 'renderFeedback') {
+  if (watchedState.form.status === 'renderFeedback') {
     renderFeedback(elements, watchedState, i18nextInstance);
   }
 
-  if (watchedState.status === 'readyToLoad') {
+  if (watchedState.form.status === 'readyToLoad') {
     const dataFeeds = watchedState.data.feeds;
     const dataPosts = watchedState.data.posts;
     handlePosts(watchedState, dataPosts, i18nextInstance, elements);
-    handleFeeds(watchedState, dataFeeds, i18nextInstance, elements);
+    handleFeeds(dataFeeds, i18nextInstance, elements);
     elements.form.reset();
     elements.input.focus();
-    watchedState.status = '';
+    watchedState.form.status = 'finished';
   }
 
-  if (watchedState.modal.activePost !== '') {
+  if (watchedState.modal.status === 'active') {
     handleModal(watchedState);
   }
 };

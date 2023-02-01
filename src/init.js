@@ -7,121 +7,116 @@ import parser from './parser.js';
 import renderData from './view.js';
 import updatePosts from './updatePosts.js';
 
-const app = () => {
+const app = async () => {
   const i18nInstance = i18next.createInstance();
 
-  i18nInstance.init({
+  await i18nInstance.init({
     lng: 'ru',
     debug: false,
     resources,
-  })
-    .then(() => {
-      yup.setLocale({
-        mixed: {
-          notOneOf: i18nInstance.t('errors.alreadyExist'),
-        },
-        string: {
-          required: i18nInstance.t('errors.empty'),
-          url: i18nInstance.t('errors.notValid'),
-        },
-      });
+  });
 
-      const elements = {
-        feedback: document.querySelector('.feedback'),
-        form: document.querySelector('.rss-form'),
-        feeds: document.querySelector('.feeds'),
-        posts: document.querySelector('.posts'),
-        input: document.querySelector('input'),
-      };
+  yup.setLocale({
+    mixed: {
+      notOneOf: i18nInstance.t('alreadyExists'),
+    },
+    string: {
+      required: i18nInstance.t('empty'),
+      url: i18nInstance.t('notValid'),
+    },
+  });
 
-      const state = {
-        modal: {
-          activePost: '',
-        },
-        openedPosts: [],
-        form: {
-          valid: null,
-          link: '',
-        },
-        feedback: {
-          type: '',
-          message: '',
-        },
-        addedLinks: [],
-        data: {
-          feeds: [],
-          posts: [],
-        },
-        status: 'initial',
-      };
+  const elements = {
+    feedback: document.querySelector('.feedback'),
+    form: document.querySelector('.rss-form'),
+    feeds: document.querySelector('.feeds'),
+    posts: document.querySelector('.posts'),
+    input: document.querySelector('input'),
+  };
 
-      const watchedState = onChange(state, () => renderData(watchedState, i18nInstance, elements));
-      const handleError = (error) => {
-        switch (error.name) {
-          case 'ValidationError':
-            watchedState.form.valid = false;
-            watchedState.feedback.type = 'validationError';
-            watchedState.feedback.message = error.message;
-            break;
-          case 'AxiosError':
-            watchedState.feedback.type = 'axiosError';
-            watchedState.feedback.message = i18nInstance.t('errors.network');
-            break;
-          case 'Error':
-            if (error.message === 'ParserError') {
-              watchedState.feedback.type = 'parserError';
-              watchedState.feedback.message = i18nInstance.t('errors.notRss');
-            }
-            break;
-          default:
-            watchedState.feedback.type = 'unknownError';
-            watchedState.feedback.message = error.message;
-            throw new Error('UnknownError');
+  const state = {
+    modal: {
+      status: 'inactive',
+      activePost: null,
+    },
+    openedPosts: [],
+    form: {
+      status: 'filling',
+      validationError: false,
+    },
+    loading: {
+      error: null,
+      status: 'lodaing',
+    },
+    addedLinks: [],
+    data: {
+      feeds: [],
+      posts: [],
+    },
+  };
+
+  const watchedState = onChange(state, () => renderData(watchedState, i18nInstance, elements));
+  const handleError = (error) => {
+    switch (error.name) {
+      case 'ValidationError':
+        watchedState.loading.error = 'validationError';
+        watchedState.form.validationError = error.message;
+        break;
+      case 'AxiosError':
+        watchedState.loading.error = 'axiosError';
+        break;
+      case 'Error':
+        if (error.message === 'ParserError') {
+          watchedState.loading.error = 'parserError';
         }
-        watchedState.status = 'renderFeedback';
-      };
-      const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
+        break;
+      default:
+        watchedState.loading.error = 'unknownError';
+        throw new Error('UnknownError');
+    }
+    watchedState.form.status = 'renderFeedback';
+    watchedState.loading.status = 'failed';
+  };
+  const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
 
-      elements.form.addEventListener('submit', (e) => {
-        const schema = makeSchema(watchedState.addedLinks);
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const value = formData.get('url');
-        watchedState.form.link = value;
-        schema.validate(watchedState.form.link)
-          .then((link) => {
-            watchedState.status = 'validated';
-            watchedState.form.valid = true;
-            watchedState.errors = null;
-            watchedState.addedLinks.push(link);
-            return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
-          })
-          .then((response) => response.data.contents)
-          .then((content) => parser(watchedState, content))
-          .then((data) => {
-            const { feeds, posts } = data;
-            feeds.url = elements.input.value;
-            console.log(feeds.url);
-            watchedState.data.posts.unshift(...posts);
-            watchedState.data.feeds.push(feeds);
-            watchedState.feedback.type = 'success';
-            watchedState.status = 'renderFeedback';
-          })
-          .catch((error) => {
-            handleError(error);
-          });
+  elements.form.addEventListener('submit', (e) => {
+    watchedState.form.status = 'sending';
+    const schema = makeSchema(watchedState.addedLinks);
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const value = formData.get('url');
+    schema.validate(value)
+      .then((link) => {
+        watchedState.form.status = 'validated';
+        watchedState.addedLinks.push(link);
+        return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
+      })
+      .then((response) => response.data.contents)
+      .then((content) => parser(content))
+      .then((data) => {
+        const { feeds, posts } = data;
+        feeds.url = elements.input.value;
+        watchedState.data.posts.unshift(...posts);
+        watchedState.data.feeds.push(feeds);
+        watchedState.loading.status = 'success';
+        watchedState.form.status = 'renderFeedback';
+      })
+      .catch((error) => {
+        watchedState.loading.status = 'failed';
+        handleError(error);
       });
+  });
 
-      elements.posts.addEventListener('click', (e) => {
-        const postId = e.target.dataset.id;
-        if (!postId || e.target.tagName !== 'BUTTON') {
-          return;
-        }
-        watchedState.openedPosts.push(postId);
-        watchedState.modal.activePost = postId;
-      });
+  elements.posts.addEventListener('click', (e) => {
+    watchedState.modal.status = 'active';
+    const postId = e.target.dataset.id;
+    if (!postId || e.target.tagName !== 'BUTTON') {
+      return;
+    }
+    watchedState.openedPosts.push(postId);
+    watchedState.modal.activePost = postId;
+  });
 
-      updatePosts(watchedState);
-    });
+  updatePosts(watchedState);
 };
 export default app;

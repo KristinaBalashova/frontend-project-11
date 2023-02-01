@@ -9,7 +9,7 @@ const updatePosts = (watchedState) => {
     const promise = axios.get(proxy)
       .then((response) => response.data.contents)
       .then((contents) => {
-        const { posts } = parser(watchedState, contents);
+        const { posts } = parser(contents);
         const postsFromState = watchedState.data.posts;
         const postsWithCurrentId = postsFromState.filter((post) => post.feedId === element.id);
         const addedTitles = postsWithCurrentId.map((el) => el.title);
@@ -20,7 +20,8 @@ const updatePosts = (watchedState) => {
         });
       })
       .catch((error) => {
-        watchedState.feedback.message = error.message;
+        console.log(error);
+        watchedState.loading.error = error;
       });
     watchedState.status = 'readyToLoad';
     return promise;
