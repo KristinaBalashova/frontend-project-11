@@ -18,16 +18,7 @@ const config = {
     new HtmlWebpackPlugin({
       template: "index.html",
     }),
-    [
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // compile time plugins
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"',
-    }),
-    // webpack-dev-server enhancement plugins
-    new DashboardPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
-  ],
+    [new MiniCssExtractPlugin()],
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],
@@ -55,7 +46,10 @@ const config = {
         test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
         use: 'file-loader',
       },
-
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
       // Add your rules for custom modules here
       // Learn more about loaders from https://webpack.js.org/loaders/
     ],
