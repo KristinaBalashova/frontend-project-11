@@ -46,9 +46,8 @@ const app = async () => {
     },
     loading: {
       error: null,
-      status: 'lodaing',
+      status: 'waitingForData',
     },
-    // addedLinks: [],
     data: {
       feeds: [],
       posts: [],
@@ -89,7 +88,7 @@ const app = async () => {
     schema.validate(value)
       .then((link) => {
         watchedState.form.status = 'validated';
-        //watchedState.addedLinks.push(link);
+        watchedState.loading.status = 'loading';
         return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
       })
       .then((response) => response.data.contents)
