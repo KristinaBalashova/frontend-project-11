@@ -48,7 +48,7 @@ const app = async () => {
       error: null,
       status: 'lodaing',
     },
-    addedLinks: [],
+    // addedLinks: [],
     data: {
       feeds: [],
       posts: [],
@@ -81,14 +81,15 @@ const app = async () => {
 
   elements.form.addEventListener('submit', (e) => {
     watchedState.form.status = 'sending';
-    const schema = makeSchema(watchedState.addedLinks);
+    const addedLinks = watchedState.data.feeds.map((feed) => feed.url);
+    const schema = makeSchema(addedLinks);
     e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
     schema.validate(value)
       .then((link) => {
         watchedState.form.status = 'validated';
-        watchedState.addedLinks.push(link);
+        //watchedState.addedLinks.push(link);
         return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
       })
       .then((response) => response.data.contents)
