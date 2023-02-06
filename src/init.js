@@ -110,7 +110,7 @@ const app = async () => {
   elements.posts.addEventListener('click', (e) => {
     watchedState.modal.status = 'active';
     const postId = e.target.dataset.id;
-    if (!postId || e.target.tagName !== 'BUTTON') {
+    if (!postId) {
       return;
     }
     watchedState.openedPosts.push(postId);
