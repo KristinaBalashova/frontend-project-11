@@ -36,7 +36,6 @@ const app = async () => {
 
   const state = {
     modal: {
-      status: 'inactive',
       activePost: null,
     },
     openedPosts: [],
@@ -108,7 +107,6 @@ const app = async () => {
   });
 
   elements.posts.addEventListener('click', (e) => {
-    watchedState.modal.status = 'active';
     const postId = e.target.dataset.id;
     if (!postId) {
       return;

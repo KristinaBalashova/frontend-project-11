@@ -156,7 +156,7 @@ const renderData = (watchedState, i18nextInstance, elements) => {
     watchedState.form.status = 'finished';
   }
 
-  if (watchedState.modal.status === 'active') {
+  if (watchedState.modal.status !== null) {
     handleModal(watchedState);
   }
 };
