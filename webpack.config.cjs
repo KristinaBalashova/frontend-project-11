@@ -2,7 +2,7 @@
 
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const isProduction = process.env.NODE_ENV == "production";
 
 const config = {
@@ -18,7 +18,16 @@ const config = {
     new HtmlWebpackPlugin({
       template: "index.html",
     }),
-
+    [
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // compile time plugins
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"',
+    }),
+    // webpack-dev-server enhancement plugins
+    new DashboardPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+  ],
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],
