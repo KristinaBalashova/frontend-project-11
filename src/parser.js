@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 const parser = (contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
@@ -9,8 +7,6 @@ const parser = (contents) => {
   }
   const description = doc.querySelector('channel > description');
   const feed = {
-    url: '',
-    id: _.uniqueId(),
     title: title.textContent,
     description: description.textContent,
   };
@@ -21,8 +17,6 @@ const parser = (contents) => {
     const itemUrl = item.querySelector('link');
     const itemDescription = item.querySelector('description');
     const post = {
-      id: _.uniqueId(),
-      feedId: feed.id,
       title: itemTitle.textContent,
       description: itemDescription.textContent,
       link: itemUrl.textContent,

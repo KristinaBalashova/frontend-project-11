@@ -2,10 +2,12 @@ import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
+import _ from 'lodash';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import renderData from './view.js';
 import updatePosts from './updatePosts.js';
+/* eslint-disable no-param-reassign */
 
 const app = async () => {
   const i18nInstance = i18next.createInstance();
@@ -95,6 +97,11 @@ const app = async () => {
       .then((data) => {
         const { feeds, posts } = data;
         feeds.url = elements.input.value;
+        feeds.id = _.uniqueId();
+        posts.forEach((post) => {
+          post.id = _.uniqueId();
+          posts.feedId = feeds.id;
+        });
         watchedState.data.posts.unshift(...posts);
         watchedState.data.feeds.push(feeds);
         watchedState.loading.status = 'success';
