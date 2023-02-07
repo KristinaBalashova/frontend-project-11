@@ -95,12 +95,12 @@ const app = async () => {
       .then((response) => response.data.contents)
       .then((content) => parser(content))
       .then((data) => {
-        const { feeds, posts } = data;
-        feeds.url = elements.input.value;
-        feeds.id = _.uniqueId();
+        const { feed, posts } = data;
+        feed.url = elements.input.value;
+        feed.id = _.uniqueId();
         posts.forEach((post) => {
           post.id = _.uniqueId();
-          posts.feedId = feeds.id;
+          posts.feedId = feed.id;
         });
         watchedState.data.posts.unshift(...posts);
         watchedState.data.feeds.push(feeds);
