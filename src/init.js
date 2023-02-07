@@ -103,7 +103,7 @@ const app = async () => {
           posts.feedId = feed.id;
         });
         watchedState.data.posts.unshift(...posts);
-        watchedState.data.feeds.push(feeds);
+        watchedState.data.feeds.push(feed);
         watchedState.loading.status = 'success';
         watchedState.form.status = 'renderFeedback';
       })
