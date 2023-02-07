@@ -99,7 +99,9 @@ const handleModal = (watchedState) => {
   });
 };
 const renderValidationError = (errorMessage, elements, i18nextInstance) => {
-  console.log('message', errorMessage);
+  elements.input.classList.add('is-invalid');
+  elements.feedback.classList.remove('text-success');
+  elements.feedback.classList.add('text-danger');
   switch (errorMessage) {
     case 'alreadyExists':
       elements.feedback.textContent = i18nextInstance.t('error.alreadyExists');
@@ -114,49 +116,44 @@ const renderValidationError = (errorMessage, elements, i18nextInstance) => {
       throw new Error('Unknown error');
   }
 };
-const renderFeedback = (elements, watchedState, i18nextInstance) => {
+const renderLoadingError = (elements, watchedState, i18nextInstance) => {
+  elements.input.classList.add('is-invalid');
+  elements.feedback.classList.remove('text-success');
+  elements.feedback.classList.add('text-danger');
+  switch (watchedState.loading.error) {
+    case 'axiosError':
+      elements.feedback.textContent = i18nextInstance.t('error.network');
+      break;
+    case 'parserError':
+      elements.feedback.textContent = i18nextInstance.t('error.notRss');
+      break;
+    default:
+      throw new Error('Unknown error');
+  }
+};
+
+const renderData = (watchedState, i18nextInstance, elements) => {
+  if (watchedState.form.status === 'invalid') {
+    renderValidationError(watchedState.form.validationError, elements, i18nextInstance);
+  }
+  if (watchedState.loading.status === 'failed') {
+    renderLoadingError(elements, watchedState, i18nextInstance);
+  }
   if (watchedState.loading.status === 'success') {
     elements.input.classList.remove('is-invalid');
     elements.feedback.classList.remove('text-danger');
     elements.feedback.classList.add('text-success');
     elements.feedback.innerHTML = i18nextInstance.t('success');
-    watchedState.form.status = 'readyToLoad';
-  } else {
-    elements.input.classList.add('is-invalid');
-    elements.feedback.classList.remove('text-success');
-    elements.feedback.classList.add('text-danger');
-    switch (watchedState.loading.error) {
-      case 'validationError':
-        renderValidationError(watchedState.form.validationError, elements, i18nextInstance);
-        break;
-      case 'axiosError':
-        elements.feedback.textContent = i18nextInstance.t('error.network');
-        break;
-      case 'parserError':
-        elements.feedback.textContent = i18nextInstance.t('error.notRss');
-        break;
-      default:
-        throw new Error('Unknown error');
-    }
-  }
-};
-
-const renderData = (watchedState, i18nextInstance, elements) => {
-  if (watchedState.form.status === 'renderFeedback') {
-    renderFeedback(elements, watchedState, i18nextInstance);
-  }
-
-  if (watchedState.form.status === 'readyToLoad') {
     const dataFeeds = watchedState.data.feeds;
     const dataPosts = watchedState.data.posts;
     handlePosts(watchedState, dataPosts, i18nextInstance, elements);
     handleFeeds(dataFeeds, i18nextInstance, elements);
     elements.form.reset();
     elements.input.focus();
-    watchedState.form.status = 'finished';
+    watchedState.loading.status = 'waitingForData';
   }
 
-  if (watchedState.modal.status !== null) {
+  if (watchedState.modal.activePost !== null) {
     handleModal(watchedState);
   }
 };

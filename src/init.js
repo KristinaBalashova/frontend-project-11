@@ -43,7 +43,7 @@ const app = async () => {
     openedPosts: [],
     form: {
       status: 'filling',
-      validationError: false,
+      validationError: null,
     },
     loading: {
       error: null,
@@ -59,23 +59,24 @@ const app = async () => {
   const handleError = (error) => {
     switch (error.name) {
       case 'ValidationError':
-        watchedState.loading.error = 'validationError';
         watchedState.form.validationError = error.message;
+        watchedState.form.status = 'invalid';
         break;
       case 'AxiosError':
         watchedState.loading.error = 'axiosError';
+        watchedState.liading.status = 'failed';
         break;
       case 'Error':
         if (error.message === 'ParserError') {
           watchedState.loading.error = 'parserError';
+          watchedState.loading.status = 'failed';
         }
         break;
       default:
         watchedState.loading.error = 'unknownError';
+        watchedState.loading.status = 'failed';
         throw new Error('UnknownError');
     }
-    watchedState.form.status = 'renderFeedback';
-    watchedState.loading.status = 'failed';
   };
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
 
@@ -88,7 +89,7 @@ const app = async () => {
     const value = formData.get('url');
     schema.validate(value)
       .then((link) => {
-        watchedState.form.status = 'validated';
+        watchedState.form.status = 'valid';
         watchedState.loading.status = 'loading';
         return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
       })
@@ -105,11 +106,9 @@ const app = async () => {
         watchedState.data.posts.unshift(...posts);
         watchedState.data.feeds.push(feed);
         watchedState.loading.status = 'success';
-        watchedState.form.status = 'renderFeedback';
+        watchedState.form.status = 'filling';
       })
       .catch((error) => {
-        console.log(error);
-        watchedState.loading.status = 'failed';
         handleError(error);
       });
   });
