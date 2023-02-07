@@ -64,7 +64,7 @@ const app = async () => {
         break;
       case 'AxiosError':
         watchedState.loading.error = 'axiosError';
-        watchedState.liading.status = 'failed';
+        watchedState.loading.status = 'failed';
         break;
       case 'Error':
         if (error.message === 'ParserError') {
