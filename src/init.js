@@ -108,6 +108,7 @@ const app = async () => {
         watchedState.form.status = 'renderFeedback';
       })
       .catch((error) => {
+        console.log(error);
         watchedState.loading.status = 'failed';
         handleError(error);
       });

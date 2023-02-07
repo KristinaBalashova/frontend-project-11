@@ -10,7 +10,7 @@ const parser = (contents) => {
     title: title.textContent,
     description: description.textContent,
   };
-  const data = { feeds: feed, posts: [] };
+  const data = { feed, posts: [] };
   const items = doc.querySelectorAll('item');
   items.forEach((item) => {
     const itemTitle = item.querySelector('title');
