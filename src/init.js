@@ -134,6 +134,7 @@ const app = async () => {
         watchedState.form.status = 'filling';
       })
       .catch((error) => {
+        console.log(error);
         handleError(error);
       });
   });

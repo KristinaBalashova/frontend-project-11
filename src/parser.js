@@ -1,7 +1,7 @@
 const parser = (contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
-  if (dom.querySelector('parsererror')) {
+  if (doc.querySelector('parsererror')) {
     throw new Error('ParserError');
   }
   const title = doc.querySelector('channel > title');
