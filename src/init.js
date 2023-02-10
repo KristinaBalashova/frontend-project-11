@@ -6,8 +6,33 @@ import _ from 'lodash';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import renderData from './view.js';
-import updatePosts from './updatePosts.js';
 /* eslint-disable no-param-reassign */
+
+const updatePosts = (watchedState) => {
+  const promises = watchedState.data.feeds.map((element) => {
+    const { url } = element;
+    const proxy = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+    const promise = axios.get(proxy)
+      .then((response) => response.data.contents)
+      .then((contents) => {
+        const { posts } = parser(contents);
+        const postsFromState = watchedState.data.posts;
+        const postsWithCurrentId = postsFromState.filter((post) => post.feedId === element.id);
+        const addedTitles = postsWithCurrentId.map((el) => el.title);
+        const newPosts = [];
+        posts.forEach((newPost) => {
+          if (!addedTitles.includes(newPost.title)) {
+            newPosts.push(newPost);
+          }
+        });
+        watchedState.data.posts.push(newPosts);
+      })
+      .catch(() => {
+      });
+    return promise;
+  });
+  Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 5000));
+};
 
 const app = async () => {
   const i18nInstance = i18next.createInstance();
