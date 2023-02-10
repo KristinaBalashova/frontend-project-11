@@ -20,11 +20,11 @@ const app = async () => {
 
   yup.setLocale({
     mixed: {
-      notOneOf: i18nInstance.t('alreadyExists'),
+      notOneOf: 'alreadyExists',
     },
     string: {
-      required: i18nInstance.t('empty'),
-      url: i18nInstance.t('notValid'),
+      required: 'empty',
+      url: 'notValid',
     },
   });
 
