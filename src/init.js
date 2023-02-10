@@ -8,11 +8,12 @@ import parser from './parser.js';
 import renderData from './view.js';
 /* eslint-disable no-param-reassign */
 
+const proxy = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+
 const updatePosts = (watchedState) => {
   const promises = watchedState.data.feeds.map((element) => {
     const { url } = element;
-    const proxy = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
-    const promise = axios.get(proxy)
+    const promise = axios.get(proxy(url))
       .then((response) => response.data.contents)
       .then((contents) => {
         const { posts } = parser(contents);
@@ -32,6 +33,26 @@ const updatePosts = (watchedState) => {
     return promise;
   });
   Promise.all(promises).finally(() => setTimeout(() => updatePosts(watchedState), 5000));
+};
+
+const loadData = (url, watchedState) => {
+  watchedState.loading.status = 'loading';
+  axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+    .then((response) => {
+      const { contents } = response.data;
+      const data = parser(contents);
+      const { feed, posts } = data;
+      feed.url = url;
+      feed.id = _.uniqueId();
+      posts.forEach((post) => {
+        post.id = _.uniqueId();
+        posts.feedId = feed.id;
+      });
+      watchedState.data.posts.unshift(...posts);
+      watchedState.data.feeds.push(feed);
+      watchedState.loading.status = 'success';
+      watchedState.form.status = 'filling';
+    });
 };
 
 const app = async () => {
@@ -115,23 +136,7 @@ const app = async () => {
     schema.validate(value)
       .then((link) => {
         watchedState.form.status = 'valid';
-        watchedState.loading.status = 'loading';
-        return axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(link)}`);
-      })
-      .then((response) => response.data.contents)
-      .then((content) => parser(content))
-      .then((data) => {
-        const { feed, posts } = data;
-        feed.url = value;
-        feed.id = _.uniqueId();
-        posts.forEach((post) => {
-          post.id = _.uniqueId();
-          posts.feedId = feed.id;
-        });
-        watchedState.data.posts.unshift(...posts);
-        watchedState.data.feeds.push(feed);
-        watchedState.loading.status = 'success';
-        watchedState.form.status = 'filling';
+        loadData(link, watchedState);
       })
       .catch((error) => {
         console.log(error);
