@@ -97,7 +97,7 @@ const app = async () => {
       .then((content) => parser(content))
       .then((data) => {
         const { feed, posts } = data;
-        feed.url = elements.input.value;
+        feed.url = value;
         feed.id = _.uniqueId();
         posts.forEach((post) => {
           post.id = _.uniqueId();
