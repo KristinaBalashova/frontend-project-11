@@ -1,10 +1,10 @@
 const parser = (contents) => {
   const dom = new DOMParser();
   const doc = dom.parseFromString(contents, 'text/xml');
-  const title = doc.querySelector('channel > title');
-  if (!doc.querySelector('rss')) {
+  if (dom.querySelector('parsererror')) {
     throw new Error('ParserError');
   }
+  const title = doc.querySelector('channel > title');
   const description = doc.querySelector('channel > description');
   const feed = {
     title: title.textContent,
