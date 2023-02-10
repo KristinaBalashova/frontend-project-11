@@ -37,7 +37,7 @@ const updatePosts = (watchedState) => {
 
 const loadData = (url, watchedState) => {
   watchedState.loading.status = 'loading';
-  axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+  const promise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
     .then((response) => {
       const { contents } = response.data;
       const data = parser(contents);
@@ -53,6 +53,7 @@ const loadData = (url, watchedState) => {
       watchedState.loading.status = 'success';
       watchedState.form.status = 'filling';
     });
+  return promise;
 };
 
 const app = async () => {
@@ -136,10 +137,10 @@ const app = async () => {
     schema.validate(value)
       .then((link) => {
         watchedState.form.status = 'valid';
-        loadData(link, watchedState);
+        return loadData(link, watchedState);
       })
       .catch((error) => {
-        console.log(error);
+        console.log('error', error);
         handleError(error);
       });
   });
