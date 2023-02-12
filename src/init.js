@@ -1,11 +1,10 @@
-import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
 import _ from 'lodash';
 import resources from './locales/index.js';
 import parser from './parser.js';
-import renderData from './view.js';
+import launchWatcher from './view.js';
 /* eslint-disable no-param-reassign */
 
 const proxy = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
@@ -26,7 +25,9 @@ const updatePosts = (watchedState) => {
             newPosts.push(newPost);
           }
         });
-        watchedState.data.posts.push(newPosts);
+        if (newPosts.length !== 0) {
+          watchedState.data.posts.push(newPosts);
+        }
       })
       .catch(() => {
       });
@@ -46,7 +47,7 @@ const loadData = (url, watchedState) => {
       feed.id = _.uniqueId();
       posts.forEach((post) => {
         post.id = _.uniqueId();
-        posts.feedId = feed.id;
+        post.feedId = feed.id;
       });
       watchedState.data.posts.unshift(...posts);
       watchedState.data.feeds.push(feed);
@@ -102,7 +103,7 @@ const app = async () => {
     },
   };
 
-  const watchedState = onChange(state, () => renderData(watchedState, i18nInstance, elements));
+  const watchedState = launchWatcher(state, i18nInstance, elements);
   const handleError = (error) => {
     switch (error.name) {
       case 'ValidationError':
@@ -128,10 +129,10 @@ const app = async () => {
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
 
   elements.form.addEventListener('submit', (e) => {
+    e.preventDefault();
     watchedState.form.status = 'sending';
     const addedLinks = watchedState.data.feeds.map((feed) => feed.url);
     const schema = makeSchema(addedLinks);
-    e.preventDefault();
     const formData = new FormData(e.target);
     const value = formData.get('url');
     schema.validate(value)

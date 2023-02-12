@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
+import onChange from 'on-change';
 
-const handleFeeds = (dataFeeds, i18nextInstance, elements) => {
+const handleFeeds = (dataFeeds, i18nInstance, elements) => {
   elements.feeds.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -8,7 +9,7 @@ const handleFeeds = (dataFeeds, i18nextInstance, elements) => {
   divBody.classList.add('card-body');
   const h2 = document.createElement('h2');
   h2.classList.add('card-title', 'h4');
-  h2.innerHTML = i18nextInstance.t('interface.feeds');
+  h2.innerHTML = i18nInstance.t('interface.feeds');
   divBorder.prepend(divBody);
   divBody.append(h2);
   elements.feeds.prepend(divBorder);
@@ -37,7 +38,7 @@ const handleFeeds = (dataFeeds, i18nextInstance, elements) => {
   });
 };
 
-const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
+const handlePosts = (watchedState, postsData, i18nInstance, elements) => {
   elements.posts.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -45,7 +46,7 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
   divBody.classList.add('card-body');
   const h2 = document.createElement('h2');
   h2.classList.add('card-title', 'h4');
-  h2.innerHTML = i18nextInstance.t('interface.posts');
+  h2.innerHTML = i18nInstance.t('interface.posts');
   divBorder.prepend(divBody);
   divBody.append(h2);
   elements.posts.prepend(divBorder);
@@ -75,7 +76,7 @@ const handlePosts = (watchedState, postsData, i18nextInstance, elements) => {
     btn.dataset.id = post.id;
     btn.dataset.bsToggle = 'modal';
     btn.dataset.bsTarget = '#modal';
-    btn.textContent = i18nextInstance.t('interface.previewButton');
+    btn.textContent = i18nInstance.t('interface.previewButton');
     li.append(a);
     li.append(btn);
     return li;
@@ -95,64 +96,75 @@ const handleModal = (watchedState) => {
   a.classList.add('fw-normal');
   a.classList.remove('fw-bold');
 };
-const renderValidationError = (errorMessage, elements, i18nextInstance) => {
+const renderValidationError = (errorMessage, elements, i18nInstance) => {
   elements.input.classList.add('is-invalid');
   elements.feedback.classList.remove('text-success');
   elements.feedback.classList.add('text-danger');
   switch (errorMessage) {
     case 'alreadyExists':
-      elements.feedback.textContent = i18nextInstance.t('error.alreadyExists');
+      elements.feedback.textContent = i18nInstance.t('error.alreadyExists');
       break;
     case 'empty':
-      elements.feedback.textContent = i18nextInstance.t('error.empty');
+      elements.feedback.textContent = i18nInstance.t('error.empty');
       break;
     case 'notValid':
-      elements.feedback.textContent = i18nextInstance.t('error.notValid');
+      elements.feedback.textContent = i18nInstance.t('error.notValid');
       break;
     default:
       throw new Error('Unknown error');
   }
 };
-const renderLoadingError = (elements, watchedState, i18nextInstance) => {
+const renderLoadingError = (elements, watchedState, i18nInstance) => {
   elements.input.classList.add('is-invalid');
   elements.feedback.classList.remove('text-success');
   elements.feedback.classList.add('text-danger');
   switch (watchedState.loading.error) {
     case 'axiosError':
-      elements.feedback.textContent = i18nextInstance.t('error.network');
+      elements.feedback.textContent = i18nInstance.t('error.network');
       break;
     case 'parserError':
-      elements.feedback.textContent = i18nextInstance.t('error.notRss');
+      elements.feedback.textContent = i18nInstance.t('error.notRss');
       break;
     default:
       throw new Error('Unknown error');
   }
 };
 
-const renderData = (watchedState, i18nextInstance, elements) => {
-  if (watchedState.form.status === 'invalid') {
-    renderValidationError(watchedState.form.validationError, elements, i18nextInstance);
-  }
-  if (watchedState.loading.status === 'failed') {
-    renderLoadingError(elements, watchedState, i18nextInstance);
-  }
-  if (watchedState.loading.status === 'success') {
-    elements.input.classList.remove('is-invalid');
-    elements.feedback.classList.remove('text-danger');
-    elements.feedback.classList.add('text-success');
-    elements.feedback.innerHTML = i18nextInstance.t('success');
-    const dataFeeds = watchedState.data.feeds;
-    const dataPosts = watchedState.data.posts;
-    handlePosts(watchedState, dataPosts, i18nextInstance, elements);
-    handleFeeds(dataFeeds, i18nextInstance, elements);
-    elements.form.reset();
-    elements.input.focus();
-    watchedState.loading.status = 'waitingForData';
-  }
-
-  if (watchedState.modal.activePost !== null) {
-    handleModal(watchedState);
-  }
+const launchWatcher = (state, i18nInstance, elements) => {
+  const watchedState = onChange(state, (path, value) => {
+    switch (path) {
+      case 'form.status':
+        if (value === 'invalid') {
+          renderValidationError(watchedState.form.validationError, elements, i18nInstance);
+        }
+        break;
+      case 'loading.status':
+        if (value === 'failed') {
+          renderLoadingError(elements, watchedState, i18nInstance);
+        }
+        if (value === 'success') {
+          elements.input.classList.remove('is-invalid');
+          elements.feedback.classList.remove('text-danger');
+          elements.feedback.classList.add('text-success');
+          elements.feedback.innerHTML = i18nInstance.t('success');
+          const dataFeeds = watchedState.data.feeds;
+          const dataPosts = watchedState.data.posts;
+          handlePosts(watchedState, dataPosts, i18nInstance, elements);
+          handleFeeds(dataFeeds, i18nInstance, elements);
+          elements.form.reset();
+          elements.input.focus();
+          watchedState.loading.status = 'waitingForData';
+        }
+        break;
+      case 'modal.activePost':
+        if (value !== null) {
+          handleModal(watchedState);
+        }
+        break;
+      default:
+    }
+  });
+  return watchedState;
 };
 
-export default renderData;
+export default launchWatcher;
