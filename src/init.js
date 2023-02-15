@@ -13,8 +13,8 @@ const updatePosts = (watchedState) => {
   const promises = watchedState.data.feeds.map((element) => {
     const { url } = element;
     const promise = axios.get(proxy(url))
-      .then((response) => response.data.contents)
-      .then((contents) => {
+      .then((response) => {
+        const { contents } = response.data;
         const { posts } = parser(contents);
         const postsFromState = watchedState.data.posts;
         const postsWithCurrentId = postsFromState.filter((post) => post.feedId === element.id);
@@ -123,7 +123,6 @@ const app = async () => {
       default:
         watchedState.loading.error = 'unknownError';
         watchedState.loading.status = 'failed';
-        throw new Error('UnknownError');
     }
   };
   const makeSchema = (validatedLinks) => yup.string().required().url().notOneOf(validatedLinks);
@@ -151,7 +150,6 @@ const app = async () => {
     if (!postId) {
       return;
     }
-    watchedState.openedPosts.push(postId);
     watchedState.modal.activePost = postId;
   });
 
