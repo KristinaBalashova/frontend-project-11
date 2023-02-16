@@ -86,15 +86,17 @@ const handlePosts = (watchedState, postsData, i18nInstance, elements) => {
 
 const handleModal = (watchedState) => {
   const active = watchedState.data.posts.find((post) => post.id === watchedState.modal.activePost);
-  const modalHeadline = document.querySelector('h5');
-  modalHeadline.textContent = active.title;
-  const modalBody = document.querySelector('.modal-body');
-  modalBody.textContent = active.description;
-  const buttonRead = document.querySelector('.full-article');
-  buttonRead.setAttribute('href', active.link);
-  const a = document.querySelector(`a[data-id="${active.id}"]`);
-  a.classList.add('fw-normal');
-  a.classList.remove('fw-bold');
+  if (active !== null) {
+    const modalHeadline = document.querySelector('h5');
+    modalHeadline.textContent = active.title;
+    const modalBody = document.querySelector('.modal-body');
+    modalBody.textContent = active.description;
+    const buttonRead = document.querySelector('.full-article');
+    buttonRead.setAttribute('href', active.link);
+    const a = document.querySelector(`a[data-id="${active.id}"]`);
+    a.classList.add('fw-normal');
+    a.classList.remove('fw-bold');
+  }
 };
 const renderValidationError = (errorMessage, elements, i18nInstance) => {
   elements.input.classList.add('is-invalid');
