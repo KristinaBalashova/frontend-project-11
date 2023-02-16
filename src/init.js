@@ -153,6 +153,7 @@ const app = async () => {
       return;
     }
     if (!watchedState.openedPosts.includes(postId)) {
+      console.log(watchedState.openedPosts);
       watchedState.openedPosts.push(postId);
     }
     watchedState.modal.activePost = postId;
