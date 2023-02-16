@@ -24,6 +24,7 @@ const updatePosts = (watchedState) => {
           if (!addedTitles.includes(newPost.title)) {
             newPost.feedId = element.id;
             newPost.id = _.uniqueId();
+            console.log('new', newPost);
             newPosts.push(newPost);
           }
         });
@@ -151,6 +152,9 @@ const app = async () => {
     const postId = e.target.dataset.id;
     if (!postId) {
       return;
+    }
+    if (!watchedState.openedPosts.includes(postId)) {
+      watchedState.openedPosts.push(postId);
     }
     watchedState.modal.activePost = postId;
   });
