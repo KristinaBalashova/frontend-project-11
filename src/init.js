@@ -22,6 +22,8 @@ const updatePosts = (watchedState) => {
         const newPosts = [];
         posts.forEach((newPost) => {
           if (!addedTitles.includes(newPost.title)) {
+            newPost.feedId = element.id;
+            newPost.id = _.uniqueId();
             newPosts.push(newPost);
           }
         });
