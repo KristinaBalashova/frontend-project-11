@@ -1,7 +1,8 @@
 /* eslint-disable no-param-reassign */
 import onChange from 'on-change';
 
-const handleFeeds = (dataFeeds, i18nInstance, elements) => {
+const handleFeeds = (watchedState, i18nInstance, elements) => {
+  const dataFeeds = watchedState.data.feeds;
   elements.feeds.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -38,7 +39,8 @@ const handleFeeds = (dataFeeds, i18nInstance, elements) => {
   });
 };
 
-const handlePosts = (watchedState, postsData, i18nInstance, elements) => {
+const handlePosts = (watchedState, i18nInstance, elements) => {
+  const dataPosts = watchedState.data.posts;
   elements.posts.innerHTML = '';
   const divBorder = document.createElement('div');
   divBorder.classList.add('card', 'border-0');
@@ -56,7 +58,7 @@ const handlePosts = (watchedState, postsData, i18nInstance, elements) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
   div.append(ul);
 
-  const postEl = postsData.map((post) => {
+  const postEl = dataPosts.map((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
@@ -132,6 +134,16 @@ const renderLoadingError = (elements, watchedState, i18nInstance) => {
   }
 };
 
+const renderSuccessfulLoading = (elements, watchedState, i18nInstance) => {
+  elements.input.classList.remove('is-invalid');
+  elements.feedback.classList.remove('text-danger');
+  elements.feedback.classList.add('text-success');
+  elements.feedback.innerHTML = i18nInstance.t('success');
+  elements.form.reset();
+  elements.input.focus();
+  watchedState.loading.status = 'waitingForData';
+};
+
 const launchWatcher = (state, i18nInstance, elements) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
@@ -145,23 +157,17 @@ const launchWatcher = (state, i18nInstance, elements) => {
           renderLoadingError(elements, watchedState, i18nInstance);
         }
         if (value === 'success') {
-          elements.input.classList.remove('is-invalid');
-          elements.feedback.classList.remove('text-danger');
-          elements.feedback.classList.add('text-success');
-          elements.feedback.innerHTML = i18nInstance.t('success');
-          const dataFeeds = watchedState.data.feeds;
-          const dataPosts = watchedState.data.posts;
-          handlePosts(watchedState, dataPosts, i18nInstance, elements);
-          handleFeeds(dataFeeds, i18nInstance, elements);
-          elements.form.reset();
-          elements.input.focus();
-          watchedState.loading.status = 'waitingForData';
+          renderSuccessfulLoading(elements, watchedState, i18nInstance);
         }
         break;
+      case 'data.posts':
+        handlePosts(watchedState, i18nInstance, elements);
+        break;
+      case 'data.feeds':
+        handleFeeds(watchedState, i18nInstance, elements);
+        break;
       case 'modal.activePost':
-        if (value !== null) {
-          handleModal(watchedState);
-        }
+        handleModal(watchedState);
         break;
       default:
     }

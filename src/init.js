@@ -24,7 +24,6 @@ const updatePosts = (watchedState) => {
           if (!addedTitles.includes(newPost.title)) {
             newPost.feedId = element.id;
             newPost.id = _.uniqueId();
-            console.log('new', newPost);
             newPosts.push(newPost);
           }
         });
