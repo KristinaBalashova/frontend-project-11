@@ -15,10 +15,10 @@ const config = {
     host: "localhost",
   },
   plugins: [
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: "index.html",
     }),
-    new MiniCssExtractPlugin(),
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],
@@ -33,10 +33,10 @@ const config = {
         type: "asset",
       },
 
-      { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
+      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'] },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader', 'postcss-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader', 'postcss-loader'],
       },
       {
         test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -45,10 +45,6 @@ const config = {
       {
         test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
         use: 'file-loader',
-      },
-      {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       // Add your rules for custom modules here
       // Learn more about loaders from https://webpack.js.org/loaders/
