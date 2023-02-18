@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import onChange from 'on-change';
 
-const handleFeeds = (watchedState, i18nInstance, elements) => {
+const renderFeeds = (watchedState, i18nInstance, elements) => {
   const dataFeeds = watchedState.data.feeds;
   elements.feeds.innerHTML = '';
   const divBorder = document.createElement('div');
@@ -39,7 +39,7 @@ const handleFeeds = (watchedState, i18nInstance, elements) => {
   });
 };
 
-const handlePosts = (watchedState, i18nInstance, elements) => {
+const renderPosts = (watchedState, i18nInstance, elements) => {
   const dataPosts = watchedState.data.posts;
   elements.posts.innerHTML = '';
   const divBorder = document.createElement('div');
@@ -86,7 +86,7 @@ const handlePosts = (watchedState, i18nInstance, elements) => {
   ul.prepend(...postEl);
 };
 
-const handleModal = (watchedState) => {
+const renderModal = (watchedState) => {
   const active = watchedState.data.posts.find((post) => post.id === watchedState.modal.activePost);
   if (active !== null) {
     const modalHeadline = document.querySelector('h5');
@@ -95,79 +95,75 @@ const handleModal = (watchedState) => {
     modalBody.textContent = active.description;
     const buttonRead = document.querySelector('.full-article');
     buttonRead.setAttribute('href', active.link);
-    const a = document.querySelector(`a[data-id="${active.id}"]`);
-    a.classList.add('fw-normal');
-    a.classList.remove('fw-bold');
   }
 };
-const renderValidationError = (errorMessage, elements, i18nInstance) => {
-  elements.input.classList.add('is-invalid');
-  elements.feedback.classList.remove('text-success');
-  elements.feedback.classList.add('text-danger');
-  switch (errorMessage) {
-    case 'alreadyExists':
-      elements.feedback.textContent = i18nInstance.t('error.alreadyExists');
-      break;
-    case 'empty':
-      elements.feedback.textContent = i18nInstance.t('error.empty');
-      break;
-    case 'notValid':
-      elements.feedback.textContent = i18nInstance.t('error.notValid');
-      break;
-    default:
-      throw new Error('Unknown error');
-  }
-};
-const renderLoadingError = (elements, watchedState, i18nInstance) => {
-  elements.input.classList.add('is-invalid');
-  elements.feedback.classList.remove('text-success');
-  elements.feedback.classList.add('text-danger');
-  switch (watchedState.loading.error) {
-    case 'axiosError':
-      elements.feedback.textContent = i18nInstance.t('error.network');
-      break;
-    case 'parserError':
-      elements.feedback.textContent = i18nInstance.t('error.notRss');
-      break;
-    default:
-      throw new Error('Unknown error');
+const renderForm = (watchedState, i18nInstance, elements) => {
+  if (watchedState.form.status === 'invalid') {
+    elements.input.classList.add('is-invalid');
+    elements.feedback.classList.remove('text-success');
+    elements.feedback.classList.add('text-danger');
+    switch (watchedState.form.validationError) {
+      case 'alreadyExists':
+        elements.feedback.textContent = i18nInstance.t('error.alreadyExists');
+        break;
+      case 'empty':
+        elements.feedback.textContent = i18nInstance.t('error.empty');
+        break;
+      case 'notValid':
+        elements.feedback.textContent = i18nInstance.t('error.notValid');
+        break;
+      default:
+        throw new Error('Unknown error');
+    }
   }
 };
 
-const renderSuccessfulLoading = (elements, watchedState, i18nInstance) => {
-  elements.input.classList.remove('is-invalid');
-  elements.feedback.classList.remove('text-danger');
-  elements.feedback.classList.add('text-success');
-  elements.feedback.innerHTML = i18nInstance.t('success');
-  elements.form.reset();
-  elements.input.focus();
-  watchedState.loading.status = 'waitingForData';
+const renderLoading = (watchedState, i18nInstance, elements) => {
+  // console.log(value);
+  if (watchedState.loading.status === 'failed') {
+    elements.input.classList.add('is-invalid');
+    elements.feedback.classList.remove('text-success');
+    elements.feedback.classList.add('text-danger');
+    switch (watchedState.loading.error) {
+      case 'axiosError':
+        elements.feedback.textContent = i18nInstance.t('error.network');
+        break;
+      case 'parserError':
+        elements.feedback.textContent = i18nInstance.t('error.notRss');
+        break;
+      default:
+        throw new Error('Unknown error');
+    }
+  }
+  if (watchedState.loading.status === 'success') {
+    elements.input.classList.remove('is-invalid');
+    elements.feedback.classList.remove('text-danger');
+    elements.feedback.classList.add('text-success');
+    elements.feedback.innerHTML = i18nInstance.t('success');
+    elements.form.reset();
+    elements.input.focus();
+    watchedState.loading.status = 'waitingForData';
+  }
 };
 
 const launchWatcher = (state, i18nInstance, elements) => {
-  const watchedState = onChange(state, (path, value) => {
+  const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'form.status':
-        if (value === 'invalid') {
-          renderValidationError(watchedState.form.validationError, elements, i18nInstance);
-        }
+        renderForm(watchedState, i18nInstance, elements);
         break;
       case 'loading.status':
-        if (value === 'failed') {
-          renderLoadingError(elements, watchedState, i18nInstance);
-        }
-        if (value === 'success') {
-          renderSuccessfulLoading(elements, watchedState, i18nInstance);
-        }
+        renderLoading(watchedState, i18nInstance, elements);
         break;
       case 'data.posts':
-        handlePosts(watchedState, i18nInstance, elements);
+      case 'openedPosts':
+        renderPosts(watchedState, i18nInstance, elements);
         break;
       case 'data.feeds':
-        handleFeeds(watchedState, i18nInstance, elements);
+        renderFeeds(watchedState, i18nInstance, elements);
         break;
       case 'modal.activePost':
-        handleModal(watchedState);
+        renderModal(watchedState, i18nInstance, elements);
         break;
       default:
     }
