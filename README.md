@@ -3,4 +3,4 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/dce462a5eac056b98b46/maintainability)](https://codeclimate.com/github/KristinaBalashova/frontend-project-11/maintainability)
 [![Github Actions](https://github.com/KristinaBalashova/frontend-project-11/actions/workflows/github-actions.yml/badge.svg)](https://github.com/KristinaBalashova/frontend-project-11/actions/workflows/github-actions.yml)
 
-Link to the web-site: (currenly have some deploy problems, and im fixing that) [https://frontend-project-11-taupe.vercel.app/](https://frontend-project-11-indol.vercel.app/)
+Link to the web-site: (currenly have some deploy problems, and im fixing that) https://frontend-project-11-indol.vercel.app/
