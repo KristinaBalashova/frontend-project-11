@@ -7,7 +7,7 @@
 
 **RSS Feed Aggregator** is a service that allows users to conveniently read and manage various sources (blogs) through aggregated RSS feeds.
 
-Link to the web-site: https://frontend-project-11-taupe.vercel.app/
+Link to the web-site: https://frontend-project-11-indol.vercel.app/
 
 ## Features
 
